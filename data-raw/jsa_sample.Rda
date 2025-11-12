@@ -1,0 +1,20 @@
+# Create mock dataset
+jsa_sample <- tibble::tibble(
+  GEOGRAPHY_CODE = c("2092957697", "2092957698", "2092957699"),
+  GEOGRAPHY_NAME = c("United Kingdom", "Great Britain", "England"),
+  SEX = rep(7L, 3),
+  SEX_NAME = rep("Total", 3),
+  ITEM = rep(1L, 3),
+  ITEM_NAME = rep("JSA claimants", 3),
+  MEASURES = rep(20100L, 3),
+  MEASURES_NAME = rep("Persons claiming JSA", 3),
+  DATE = rep("2024-01", 3),
+  DATE_NAME = rep("January 2024", 3),
+  OBS_VALUE = c(100000, 95000, 80000),
+  OBS_STATUS = rep("A", 3),
+  RECORD_COUNT = rep(3L, 3)
+)
+
+# Save it
+dir.create("data", showWarnings = FALSE)
+save(jsa_sample, file = "data/jsa_sample.rda", compress = "bzip2")

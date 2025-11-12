@@ -1,0 +1,142 @@
+## ----setup, include = FALSE---------------------------------------------------
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 8, fig.height = 6, eval = FALSE)
+
+## -----------------------------------------------------------------------------
+# library(nomisdata)
+# library(sf)
+# library(ggplot2)
+# 
+# # Download data with KML boundaries
+# unemployment_spatial <- fetch_spatial(
+#   "NM_1_1",
+#   time = "latest",
+#   geography = "TYPE480",  # Regions
+#   measures = 20201,       # Rate
+#   sex = 7,
+#   parse_sf = TRUE         # Parse to sf object
+# )
+# 
+# # Check the object
+# class(unemployment_spatial)
+# #> [1] "sf"         "data.frame"
+# 
+# st_crs(unemployment_spatial)
+# #> Coordinate Reference System:
+# #>   WGS 84 / Pseudo-Mercator
+
+## -----------------------------------------------------------------------------
+# # Simple choropleth
+# ggplot(unemployment_spatial) +
+#   geom_sf(aes(fill = OBS_VALUE), colour = "white", size = 0.3) +
+#   scale_fill_viridis_c(option = "magma", name = "Rate (%)") +
+#   labs(
+#     title = "Unemployment Rate by Region",
+#     caption = "Source: Nomis / ONS"
+#   ) +
+#   theme_void() +
+#   theme(
+#     plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+#     legend.position = "right"
+#   )
+
+## -----------------------------------------------------------------------------
+# # Get detailed data without boundaries
+# detailed_data <- fetch_nomis(
+#   "NM_1_1",
+#   time = "latest",
+#   geography = "TYPE464",  # Local authorities
+#   measures = c(20100, 20201, 20203),
+#   sex = 7
+# )
+# 
+# # Get boundaries separately (lighter download)
+# boundaries <- fetch_spatial(
+#   "NM_1_1",
+#   time = "latest",
+#   geography = "TYPE464",
+#   measures = 20100,  # Just need one measure for boundaries
+#   sex = 7
+# )
+# 
+# # Join
+# combined <- boundaries |>
+#   select(GEOGRAPHY_CODE, geometry) |>
+#   left_join(
+#     detailed_data |> select(GEOGRAPHY_CODE, MEASURES_NAME, OBS_VALUE),
+#     by = "GEOGRAPHY_CODE"
+#   )
+
+## -----------------------------------------------------------------------------
+# # Aggregate local authorities to regional level
+# la_data <- fetch_spatial(
+#   "NM_1_1",
+#   time = "latest",
+#   geography = "TYPE464",
+#   measures = 20100,
+#   sex = 7
+# )
+# 
+# # Get regional boundaries
+# regional_bounds <- fetch_spatial(
+#   "NM_1_1",
+#   time = "latest",
+#   geography = "TYPE480",
+#   measures = 20100,
+#   sex = 7
+# )
+# 
+# # Spatial join and aggregate
+# regional_aggregated <- st_join(
+#   la_data,
+#   regional_bounds |> select(region_name = GEOGRAPHY_NAME),
+#   join = st_within
+# ) |>
+#   st_drop_geometry() |>
+#   group_by(region_name) |>
+#   summarise(total_claimants = sum(OBS_VALUE, na.rm = TRUE)) |>
+#   left_join(regional_bounds, by = c("region_name" = "GEOGRAPHY_NAME"))
+
+## -----------------------------------------------------------------------------
+# # Calculate distance to nearest urban center
+# urban_centers <- data.frame(
+#   name = c("London", "Manchester", "Birmingham"),
+#   lon = c(-0.1276, -2.2426, -1.8904),
+#   lat = c(51.5074, 53.4808, 52.4862)
+# ) |>
+#   st_as_sf(coords = c("lon", "lat"), crs = 4326)
+# 
+# # Calculate distances
+# la_centroids <- st_centroid(la_data)
+# distances <- st_distance(la_centroids, urban_centers)
+# 
+# # Add minimum distance to data
+# la_data$dist_to_urban <- apply(distances, 1, min)
+
+## -----------------------------------------------------------------------------
+# library(leaflet)
+# 
+# # Create interactive map
+# unemployment_spatial |>
+#   st_transform(4326) |>  # Transform to WGS84 for leaflet
+#   leaflet() |>
+#   addTiles() |>
+#   addPolygons(
+#     fillColor = ~colorNumeric("YlOrRd", OBS_VALUE)(OBS_VALUE),
+#     fillOpacity = 0.7,
+#     color = "white",
+#     weight = 1,
+#     label = ~paste0(GEOGRAPHY_NAME, ": ", round(OBS_VALUE, 2), "%"),
+#     highlightOptions = highlightOptions(
+#       weight = 3,
+#       color = "#666",
+#       fillOpacity = 0.9,
+#       bringToFront = TRUE
+#     )
+#   ) |>
+#   addLegend(
+#     pal = colorNumeric("YlOrRd", unemployment_spatial$OBS_VALUE),
+#     values = ~OBS_VALUE,
+#     title = "Unemployment Rate (%)",
+#     position = "bottomright"
+#   )
+

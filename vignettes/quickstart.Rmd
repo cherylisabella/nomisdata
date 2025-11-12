@@ -1,0 +1,119 @@
+---
+title: "Getting Started with nomisdata"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with nomisdata}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+  
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+## Introduction
+
+The `nomisdata` package provides easy access to UK official statistics from the Nomis database, including:
+  
+- Census data
+- Labour Force Survey
+- DWP benefit statistics  
+- Economic and demographic data
+
+## Installation
+
+```{r eval=FALSE}
+# From CRAN
+install.packages("nomisdata")
+
+# Development version
+# install.packages("remotes")
+remotes::install_github("yourname/nomisdata")
+```
+
+## Basic Workflow
+
+### 1. Search for Datasets
+
+```{r eval=FALSE}
+library(nomisdata)
+
+# Search by name
+employment <- search_datasets(name = "*employment*")
+head(employment)
+
+# Search by keywords
+census <- search_datasets(keywords = "census")
+```
+
+### 2. Explore Dataset Structure
+
+```{r eval=FALSE}
+# Get dataset information
+describe_dataset("NM_1_1")
+
+# Get available concepts/dimensions
+concepts <- get_codes("NM_1_1")
+print(concepts)
+```
+
+### 3. Get Code Options
+
+```{r eval=FALSE}
+# Get geography codes
+geographies <- get_codes("NM_1_1", "geography")
+head(geographies)
+
+# Search for specific geography
+london <- lookup_geography("London")
+print(london)
+
+# Get measure codes
+measures <- get_codes("NM_1_1", "measures")
+print(measures)
+```
+
+### 4. Download Data
+
+```{r eval=FALSE}
+# Latest JSA data by country
+jsa_data <- fetch_nomis(
+  id = "NM_1_1",
+  time = "latest",
+  geography = "TYPE499",  # Countries
+  measures = 20100,        # Claimants
+  sex = 7                  # Total
+)
+
+head(jsa_data)
+```
+
+## Using Example Data
+
+For offline work, use the included sample dataset:
+  
+```{r}
+library(nomisdata)
+data(jsa_sample)
+head(jsa_sample)
+```
+
+## API Key Setup
+
+For higher rate limits (100,000 vs 25,000 rows):
+  
+```{r eval=FALSE}
+# Register at: https://www.nomisweb.co.uk/myaccount/userjoin.asp
+
+# Set for current session
+set_api_key("your-api-key")
+
+# Or save to .Renviron for persistence
+set_api_key("your-api-key", persist = TRUE)
+```
+
+## Next Steps
+
+- See `vignette("geography")` for working with geographies
+- See `vignette("time-series")` for time series queries
+- See `vignette("caching")` for caching strategies

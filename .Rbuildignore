@@ -1,0 +1,25 @@
+## R CMD check results
+0 errors | 0 warnings | 0 notes
+
+## This is a new submission
+^doc$
+^Meta$
+^CRAN-SUBMISSION$
+^cran-comments\.md$
+"^\.git$"
+"^\.gitignore$"
+"^\.Rproj\.user$"
+"^\.Rhistory$"
+"^\.RData$"
+"^\.\.Rcheck$"
+^.*\.Rproj$
+^LICENSE\.md$
+^README\.Rmd$
+^\.github$
+^codecov\.yml$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.httr-oauth$
+^data-raw$
+^CONTRIBUTING\.md$
