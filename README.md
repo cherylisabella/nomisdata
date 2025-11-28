@@ -5,6 +5,8 @@
 [![CRAN status](https://www.r-pkg.org/badges/version/nomisdata)](https://CRAN.R-project.org/package=nomisdata)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![Total Downloads](https://cranlogs.r-pkg.org/badges/grand-total/nomisdata)](https://cran.r-project.org/package=nomisdata)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17755835.svg)](https://doi.org/10.5281/zenodo.17755835)
 <!-- badges: end -->
 
 > **R interface to UK official labour market statistics via the Nomis API**
