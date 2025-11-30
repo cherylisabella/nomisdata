@@ -471,16 +471,6 @@ All visualisations generated using real Nomis data accessed November 2025. Compl
 
 ## Citation
 
-```bibtex
-@Manual{nomisdata2024,
-  title = {nomisdata: Access Nomis UK Labour Market Data and Statistics},
-  author = {Cheryl Isabella Lim},
-  year = {2024},
-  note = {R package version 0.1.0},
-  url = {https://github.com/cherylisabella/nomisdata},
-}
-```
-
 ```r
 citation("nomisdata")
 ```
@@ -504,7 +494,6 @@ devtools::check()
 
 - **Issues**: https://github.com/cherylisabella/nomisdata/issues
 - **Discussions**: https://github.com/cherylisabella/nomisdata/discussions
-- **Email**: cheryl.academic@gmail.com
 - **Nomis Help**: https://www.nomisweb.co.uk/home/contactus.asp
 
 ## Related Resources
