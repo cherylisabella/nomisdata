@@ -70,7 +70,7 @@ Enabling reproducible workflows for:
 install.packages("nomisdata")
 
 # Development version with latest features
-pak::pak("cherylisabella/nomisdata")
+remotes::install_github("cherylisabella/nomisdata")
 
 # With all suggested dependencies for full functionality
 install.packages("nomisdata", dependencies = TRUE)

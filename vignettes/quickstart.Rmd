@@ -9,6 +9,8 @@ vignette: >
   
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+# Use temp directory during vignette build to avoid CRAN NOTE
+Sys.setenv(NOMISDATA_CACHE_DIR = file.path(tempdir(), "nomisdata"))
 ```
 
 ## Introduction

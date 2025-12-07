@@ -46,7 +46,6 @@ Main function to download data from Nomis datasets.
 }
 \examples{
 \donttest{
-# Latest JSA by country
 fetch_nomis(
   "NM_1_1",
   time = "latest",
@@ -55,7 +54,6 @@ fetch_nomis(
   sex = 7
 )
 
-# Specific geographies
 fetch_nomis(
   "NM_1_1",
   date = c("latest", "prevyear"),

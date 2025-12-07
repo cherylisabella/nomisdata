@@ -10,7 +10,7 @@
 #' @export
 #' 
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' set_api_key("your-key-here")
 #' set_api_key("your-key-here", persist = TRUE)
 #' }
@@ -45,6 +45,11 @@ set_api_key <- function(key = NULL, persist = FALSE) {
 
 #' @keywords internal
 add_to_renviron <- function(key) {
+  # Don't modify .Renviron during R CMD check
+  if (nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_"))) {
+    message("API key management not available during package checks")
+    return(invisible(NULL))
+  }
   home <- Sys.getenv("HOME")
   renv_path <- file.path(home, ".Renviron")
   
@@ -63,3 +68,4 @@ add_to_renviron <- function(key) {
   
   rlang::inform("API key saved to .Renviron")
 }
+

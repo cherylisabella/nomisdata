@@ -9,6 +9,8 @@ vignette: >
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = FALSE)
+# Use temp directory during vignette build to avoid CRAN NOTE
+Sys.setenv(NOMISDATA_CACHE_DIR = file.path(tempdir(), "nomisdata"))
 ```
 
 ## Large Data Downloads
@@ -33,7 +35,7 @@ Enable caching to avoid re-downloading data:
 
 ```{r}
 # Enable caching
-enable_cache("~/my_nomis_cache")
+enable_cache(file.path(tempdir(), "nomis_cache"))
 
 # First call downloads from API
 data1 <- fetch_nomis("NM_1_1", time = "latest", geography = "TYPE499")

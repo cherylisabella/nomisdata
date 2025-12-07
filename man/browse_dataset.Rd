@@ -12,7 +12,7 @@ browse_dataset(id, page = c("dataset", "download", "metadata"))
 \item{page}{Which page to open: "dataset", "download", "metadata"}
 }
 \value{
-Invisible TRUE if successful
+Invisible TRUE if successful. Called for side effects (opening browser).
 }
 \description{
 Opens the Nomis web interface for a dataset in your browser.

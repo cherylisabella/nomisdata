@@ -1,5 +1,4 @@
 # Tests that verify documentation accuracy
-
 test_that("exported functions have documentation", {
   exports <- getNamespaceExports("nomisdata")
   
@@ -22,32 +21,48 @@ test_that("exported functions have documentation", {
 })
 
 test_that("package has required files", {
-  # Check if we're in source or installed package
-  pkg_dir <- system.file(package = "nomisdata")
+  # This test is mainly for source package structure
+  # During devtools::test(), we are in the package root context
   
+  # Try multiple possible locations
+  desc_locations <- c(
+    "DESCRIPTION",                    # Package root (most common)
+    "../../DESCRIPTION",              # From tests/testthat/
+    file.path("..", "..", "DESCRIPTION")  # Alternative path format
+  )
+  
+  # Also check if package is installed
+  pkg_dir <- system.file(package = "nomisdata")
   if (nzchar(pkg_dir)) {
-    # Installed package - check installed location
-    desc_file <- file.path(pkg_dir, "DESCRIPTION")
-    expect_true(file.exists(desc_file), 
-                info = paste("Installed package should have DESCRIPTION at", desc_file))
-  } else {
-    # Source package during devtools::test()
-    # Try to find DESCRIPTION in parent directories
-    possible_paths <- c(
-      "DESCRIPTION",           # Already in package root
-      "../DESCRIPTION",        # One level up
-      "../../DESCRIPTION"      # Two levels up (from tests/testthat)
-    )
-    
-    found <- FALSE
-    for (path in possible_paths) {
-      if (file.exists(path)) {
-        found <- TRUE
-        break
-      }
+    desc_locations <- c(file.path(pkg_dir, "DESCRIPTION"), desc_locations)
+  }
+  
+  # Find first existing DESCRIPTION
+  desc_found <- FALSE
+  for (loc in desc_locations) {
+    if (file.exists(loc)) {
+      desc_found <- TRUE
+      break
     }
-    
-    expect_true(found, 
-                info = "DESCRIPTION file should exist in source package")
+  }
+  
+  expect_true(desc_found, 
+              info = "DESCRIPTION file should exist in package")
+})
+
+test_that("key exported functions exist", {
+  exports <- getNamespaceExports("nomisdata")
+  
+  key_functions <- c(
+    "fetch_nomis",
+    "search_datasets", 
+    "describe_dataset",
+    "get_codes"
+  )
+  
+  for (fn in key_functions) {
+    expect_true(fn %in% exports,
+                info = sprintf("Function %s should be exported", fn))
   }
 })
+

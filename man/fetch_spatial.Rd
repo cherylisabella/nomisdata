@@ -40,7 +40,6 @@ Downloads data in KML format with spatial boundaries.
 }
 \examples{
 \donttest{
-# Get spatial data for regions
 spatial_data <- fetch_spatial(
   "NM_1_1",
   time = "latest",

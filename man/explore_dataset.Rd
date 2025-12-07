@@ -10,13 +10,15 @@ explore_dataset(id)
 \item{id}{Dataset ID}
 }
 \value{
-Selected codes as a list
+Selected codes as a list, or NULL if not interactive.
 }
 \description{
 Opens an interactive menu to explore dataset dimensions and codes.
+Only works in interactive R sessions.
 }
 \examples{
 \dontrun{
+# Only works in interactive sessions
 explore_dataset("NM_1_1")
 }
 }

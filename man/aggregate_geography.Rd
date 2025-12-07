@@ -11,18 +11,18 @@ aggregate_geography(data, to_type, value_col = "OBS_VALUE", fun = sum)
 
 \item{to_type}{Target geography TYPE code}
 
-\item{value_col}{Column containing values to aggregate}
+\item{value_col}{Column containing values to aggregate (default: "OBS_VALUE")}
 
 \item{fun}{Aggregation function (default: sum)}
 }
 \value{
-Aggregated data frame
+A tibble with aggregated data grouped by specified variables.
 }
 \description{
 Aggregates data to higher geography levels.
 }
 \examples{
 data(jsa_sample)
-# Aggregate to country level (if lower geographies present)
-aggregate_geography(jsa_sample, "TYPE499", "OBS_VALUE")
+aggregated <- aggregate_geography(jsa_sample, "TYPE499", "OBS_VALUE")
+head(aggregated)
 }

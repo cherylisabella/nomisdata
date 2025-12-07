@@ -15,7 +15,7 @@ test_that("caching improves performance", {
   
   temp_dir <- tempfile()
   dir.create(temp_dir)
-  options(nomisdata.cache_dir = temp_dir)
+  options(nomisdata.cache_dir = file.path(tempdir(), "nomisdata_test"))
   on.exit(unlink(temp_dir, recursive = TRUE))
   
   # First fetch (uncached)

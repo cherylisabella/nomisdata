@@ -25,16 +25,12 @@ Get Concept Codes
 }
 \examples{
 \donttest{
-# All concepts
 get_codes("NM_1_1")
 
-# Specific concept
 get_codes("NM_1_1", "geography")
 
-# With type filter
 get_codes("NM_1_1", "geography", "TYPE499")
 
-# Search (note: may return empty if no matches)
 get_codes("NM_1_1", "geography", search = "*manchester*")
 }
 }

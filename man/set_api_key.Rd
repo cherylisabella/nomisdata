@@ -19,7 +19,7 @@ Configure your Nomis API key for increased rate limits.
 Register at: https://www.nomisweb.co.uk/myaccount/userjoin.asp
 }
 \examples{
-\dontrun{
+\donttest{
 set_api_key("your-key-here")
 set_api_key("your-key-here", persist = TRUE)
 }

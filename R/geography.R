@@ -53,3 +53,4 @@ lookup_geography <- function(search_term, dataset_id = "NM_1_1", type = NULL) {
     tibble::tibble()
   })
 }
+

@@ -1,3 +1,4 @@
+
 #' Browse Dataset Online
 #' 
 #' @importFrom utils head
@@ -7,7 +8,8 @@
 #' @param id Dataset ID (e.g., "NM_1_1")
 #' @param page Which page to open: "dataset", "download", "metadata"
 #' 
-#' @return Invisible TRUE if successful
+#' @return Invisible TRUE if successful. Called for side effects (opening browser).
+#' 
 #' @export
 #' 
 #' @examples
@@ -37,17 +39,22 @@ browse_dataset <- function(id, page = c("dataset", "download", "metadata")) {
   invisible(TRUE)
 }
 
+
+
 #' Interactive Dataset Explorer
 #' 
 #' @description Opens an interactive menu to explore dataset dimensions and codes.
+#'   Only works in interactive R sessions.
 #' 
 #' @param id Dataset ID
 #' 
-#' @return Selected codes as a list
+#' @return Selected codes as a list, or NULL if not interactive.
+#' 
 #' @export
 #' 
 #' @examples
 #' \dontrun{
+#' # Only works in interactive sessions
 #' explore_dataset("NM_1_1")
 #' }
 explore_dataset <- function(id) {
@@ -79,3 +86,5 @@ explore_dataset <- function(id) {
   
   invisible(NULL)
 }
+
+

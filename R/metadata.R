@@ -11,16 +11,12 @@
 #' 
 #' @examples
 #' \donttest{
-#' # All concepts
 #' get_codes("NM_1_1")
 #' 
-#' # Specific concept
 #' get_codes("NM_1_1", "geography")
 #' 
-#' # With type filter
 #' get_codes("NM_1_1", "geography", "TYPE499")
 #' 
-#' # Search (note: may return empty if no matches)
 #' get_codes("NM_1_1", "geography", search = "*manchester*")
 #' }
 get_codes <- function(id, concept = NULL, type = NULL, search = NULL, ...) {
@@ -206,3 +202,4 @@ fetch_codelist <- function(id, concept, search = NULL) {
   
   rlang::abort("Package 'rsdmx' required")
 }
+

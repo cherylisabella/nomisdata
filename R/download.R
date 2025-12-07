@@ -18,7 +18,6 @@
 #' 
 #' @examples
 #' \donttest{
-#' # Latest JSA by country
 #' fetch_nomis(
 #'   "NM_1_1",
 #'   time = "latest",
@@ -27,7 +26,6 @@
 #'   sex = 7
 #' )
 #' 
-#' # Specific geographies
 #' fetch_nomis(
 #'   "NM_1_1",
 #'   date = c("latest", "prevyear"),
@@ -178,3 +176,4 @@ fetch_paginated <- function(id, params, total_rows, max_rows, show_progress) {
   
   dplyr::bind_rows(results)
 }
+

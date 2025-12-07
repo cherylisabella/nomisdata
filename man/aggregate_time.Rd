@@ -16,18 +16,21 @@ aggregate_time(
 
 \item{period}{Aggregation period: "year", "quarter", "month"}
 
-\item{value_col}{Column containing values}
+\item{value_col}{Column containing values to aggregate}
 
-\item{fun}{Aggregation function}
+\item{fun}{Aggregation function (default: mean)}
 }
 \value{
-Aggregated data frame
+A tibble with PERIOD column and aggregated values.
 }
 \description{
 Aggregates data over time periods.
 }
 \examples{
 data(jsa_sample)
-# If time series data available
-# aggregate_time(data, "year", "OBS_VALUE")
+\donttest{
+if ("DATE" \%in\% names(jsa_sample)) {
+  yearly_data <- aggregate_time(jsa_sample, "year", "OBS_VALUE")
+}
+}
 }

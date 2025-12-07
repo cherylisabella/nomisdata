@@ -16,7 +16,6 @@
 #' 
 #' @examples
 #' \donttest{
-#' # Get spatial data for regions
 #' spatial_data <- fetch_spatial(
 #'   "NM_1_1",
 #'   time = "latest",
@@ -131,3 +130,4 @@ add_geography_names <- function(data, dataset_id = "NM_1_1") {
   # Join
   dplyr::left_join(data, lookup, by = "GEOGRAPHY_CODE")
 }
+
