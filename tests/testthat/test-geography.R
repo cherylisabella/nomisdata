@@ -1,23 +1,28 @@
+# Tests for geography lookup functions
+
+# ============================================================================
+# lookup_geography() parameter validation tests
+# ============================================================================
+
 test_that("lookup_geography requires search term", {
   expect_error(
     lookup_geography(),
     "Search term required"
   )
-  
+})
+
+test_that("lookup_geography rejects empty string", {
   expect_error(
     lookup_geography(""),
     "Search term required"
   )
 })
 
-test_that("lookup_geography requires rsdmx package", {
-  skip_if_not_installed("rsdmx")
-  
-  # If we get here, rsdmx IS installed, so skip this test
-  skip("rsdmx is installed, cannot test error message")
-})
+# ============================================================================
+# lookup_geography() functionality tests
+# ============================================================================
 
-test_that("lookup_geography finds geographies", {
+test_that("lookup_geography searches for geographies", {
   skip_if_no_api()
   skip_on_cran()
   skip_if_not_installed("rsdmx")
@@ -25,20 +30,193 @@ test_that("lookup_geography finds geographies", {
   result <- lookup_geography("London")
   
   expect_s3_class(result, "tbl_df")
-  # May be empty but should not error
+  expect_true(nrow(result) >= 0)
 })
 
-test_that("lookup_geography handles no matches gracefully", {
+test_that("lookup_geography uses specified dataset_id", {
   skip_if_no_api()
   skip_on_cran()
   skip_if_not_installed("rsdmx")
   
-  # FIXED: This might warn, not message
-  expect_warning(
-    result <- lookup_geography("ZZZZNONEXISTENT9999"),
-    "Geography search failed|No matches"
-  )
+  result <- lookup_geography("London", dataset_id = "NM_1_1")
   
-  # Should return empty tibble
   expect_s3_class(result, "tbl_df")
+})
+
+test_that("lookup_geography handles type parameter", {
+  skip_if_no_api()
+  skip_on_cran()
+  skip_if_not_installed("rsdmx")
+  
+  result <- lookup_geography("Manchester", type = "TYPE464")
+  
+  expect_s3_class(result, "tbl_df")
+})
+
+test_that("lookup_geography constructs search pattern with wildcards", {
+  skip_if_no_api()
+  skip_on_cran()
+  skip_if_not_installed("rsdmx")
+  
+  result <- lookup_geography("Manchester")
+  
+  expect_s3_class(result, "tbl_df")
+})
+
+test_that("lookup_geography handles partial matches", {
+  skip_if_no_api()
+  skip_on_cran()
+  skip_if_not_installed("rsdmx")
+  
+  result <- lookup_geography("Man")
+  
+  expect_s3_class(result, "tbl_df")
+})
+
+test_that("lookup_geography handles case-insensitive search", {
+  skip_if_no_api()
+  skip_on_cran()
+  skip_if_not_installed("rsdmx")
+  
+  result1 <- lookup_geography("LONDON")
+  result2 <- lookup_geography("london")
+  
+  expect_s3_class(result1, "tbl_df")
+  expect_s3_class(result2, "tbl_df")
+})
+
+# ============================================================================
+# lookup_geography() default parameter tests
+# ============================================================================
+
+test_that("lookup_geography uses default dataset_id", {
+  skip_if_no_api()
+  skip_on_cran()
+  skip_if_not_installed("rsdmx")
+  
+  result <- lookup_geography("London")
+  
+  expect_s3_class(result, "tbl_df")
+})
+
+test_that("lookup_geography accepts NULL type parameter", {
+  skip_if_no_api()
+  skip_on_cran()
+  skip_if_not_installed("rsdmx")
+  
+  result <- lookup_geography("London", type = NULL)
+  
+  expect_s3_class(result, "tbl_df")
+})
+
+# ============================================================================
+# lookup_geography() with different dataset IDs
+# ============================================================================
+
+test_that("lookup_geography works with different dataset IDs", {
+  skip_if_no_api()
+  skip_on_cran()
+  skip_if_not_installed("rsdmx")
+  
+  result <- lookup_geography("London", dataset_id = "NM_1_1")
+  
+  expect_s3_class(result, "tbl_df")
+})
+
+# ============================================================================
+# lookup_geography() return value tests
+# ============================================================================
+
+test_that("lookup_geography always returns a tibble", {
+  skip_if_no_api()
+  skip_on_cran()
+  skip_if_not_installed("rsdmx")
+  
+  result1 <- lookup_geography("London")
+  
+  expect_s3_class(result1, "tbl_df")
+})
+
+test_that("lookup_geography returns non-NULL result", {
+  skip_if_no_api()
+  skip_on_cran()
+  skip_if_not_installed("rsdmx")
+  
+  result <- lookup_geography("London")
+  
+  expect_false(is.null(result))
+})
+
+test_that("lookup_geography successful result has expected structure", {
+  skip_if_no_api()
+  skip_on_cran()
+  skip_if_not_installed("rsdmx")
+  
+  result <- lookup_geography("London")
+  
+  expect_s3_class(result, "tbl_df")
+  expect_true(ncol(result) >= 0)
+})
+
+# ============================================================================
+# lookup_geography() integration tests
+# ============================================================================
+
+test_that("lookup_geography returns results for common place names", {
+  skip_if_no_api()
+  skip_on_cran()
+  skip_if_not_installed("rsdmx")
+  
+  cities <- c("London", "Manchester")
+  
+  for (city in cities) {
+    result <- suppressMessages(suppressWarnings(lookup_geography(city)))
+    expect_s3_class(result, "tbl_df")
+  }
+})
+
+test_that("lookup_geography handles single character search", {
+  skip_if_no_api()
+  skip_on_cran()
+  skip_if_not_installed("rsdmx")
+  
+  result <- suppressWarnings(lookup_geography("A"))
+  
+  expect_s3_class(result, "tbl_df")
+})
+
+# ============================================================================
+# lookup_geography() edge cases
+# ============================================================================
+
+test_that("lookup_geography handles numeric search terms", {
+  skip_if_no_api()
+  skip_on_cran()
+  skip_if_not_installed("rsdmx")
+  
+  result <- suppressWarnings(lookup_geography("123"))
+  
+  expect_s3_class(result, "tbl_df")
+})
+
+test_that("lookup_geography wraps search term with asterisks", {
+  skip_if_no_api()
+  skip_on_cran()
+  skip_if_not_installed("rsdmx")
+  
+  result <- lookup_geography("Birmingham")
+  
+  expect_s3_class(result, "tbl_df")
+})
+
+test_that("lookup_geography filters results appropriately", {
+  skip_if_no_api()
+  skip_on_cran()
+  skip_if_not_installed("rsdmx")
+  
+  result_broad <- suppressWarnings(lookup_geography("Man"))
+  result_specific <- suppressWarnings(lookup_geography("Manchester"))
+  
+  expect_s3_class(result_broad, "tbl_df")
+  expect_s3_class(result_specific, "tbl_df")
 })

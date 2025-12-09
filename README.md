@@ -6,6 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![Total Downloads](https://cranlogs.r-pkg.org/badges/grand-total/nomisdata)](https://cran.r-project.org/package=nomisdata)
+[![R-CMD-check](https://github.com/cherylisabella/nomisdata/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/cherylisabella/nomisdata/actions/workflows/R-CMD-check.yaml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17755835.svg)](https://doi.org/10.5281/zenodo.17755835)
 <!-- badges: end -->
 

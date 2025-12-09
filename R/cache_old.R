@@ -44,8 +44,8 @@ enable_cache <- function(path = NULL) {
 #' }
 clear_cache <- function() {
   cache_dir <- getOption("nomisdata.cache_dir")
-  if (is.null(cache_dir)) cache_dir <- get_nomis_cache_dir()
   
+  # Only proceed if cache_dir is set and exists
   if (!is.null(cache_dir) && dir.exists(cache_dir)) {
     unlink(cache_dir, recursive = TRUE)
     message("Disk cache cleared")

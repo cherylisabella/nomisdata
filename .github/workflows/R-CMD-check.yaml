@@ -1,11 +1,8 @@
 name: R-CMD-check
-
 on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
-
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
@@ -14,25 +11,42 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macOS-latest, r: 'release'}
+          - {os: macos-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest, r: 'devel', http-user-agent: 'release'}
-          - {os: ubuntu-latest, r: 'release'}
-          - {os: ubuntu-latest, r: 'oldrel-1'}
+          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,   r: 'release'}
+          - {os: ubuntu-latest,   r: 'oldrel-1'}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      R_KEEP_PKG_SOURCE: yes
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      
       - uses: r-lib/actions/setup-pandoc@v2
+      
       - uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
+      
+      # macOS: Manual dependency installation
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          options(repos = c(CRAN = "https://cloud.r-project.org"))
+          install.packages("remotes", type = "binary")
+          install.packages(c("httr2", "cli", "rlang", "glue"), type = "binary")
+          remotes::install_deps(dependencies = TRUE, upgrade = "never", type = "binary")
+          install.packages(c("rcmdcheck", "rmarkdown", "knitr"), type = "binary")
+        shell: Rscript {0}
+      
+      # Other OS: Use standard setup
       - uses: r-lib/actions/setup-r-dependencies@v2
+        if: runner.os != 'macOS'
         with:
           extra-packages: any::rcmdcheck
+          needs: check
+      
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
