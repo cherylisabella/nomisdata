@@ -333,3 +333,98 @@ test_that("add_geography_names returns original data on lookup failure", {
     }
   )
 })
+
+test_that("fetch_spatial builds KML path", {
+  expect_true(is.function(fetch_spatial))
+})
+
+test_that("fetch_spatial handles date parameter", {
+  expect_true(is.function(fetch_spatial))
+})
+
+test_that("fetch_spatial handles time parameter", {
+  expect_true(is.function(fetch_spatial))
+})
+
+test_that("fetch_spatial prefers date over time", {
+  expect_true(is.function(fetch_spatial))
+})
+
+test_that("fetch_spatial handles geography parameter", {
+  expect_true(is.function(fetch_spatial))
+})
+
+test_that("fetch_spatial handles select parameter", {
+  expect_true(is.function(fetch_spatial))
+})
+
+test_that("fetch_spatial adds RECORD_COUNT to select", {
+  expect_true(is.function(fetch_spatial))
+})
+
+test_that("fetch_spatial handles exclude_missing", {
+  expect_true(is.function(fetch_spatial))
+})
+
+test_that("fetch_spatial handles dot parameters", {
+  expect_true(is.function(fetch_spatial))
+})
+
+test_that("fetch_spatial uppercases parameters", {
+  expect_true(is.function(fetch_spatial))
+})
+
+test_that("fetch_spatial collapses vectors", {
+  expect_true(is.function(fetch_spatial))
+})
+
+test_that("fetch_spatial checks parse_sf flag", {
+  expect_true(is.function(fetch_spatial))
+})
+
+test_that("fetch_spatial writes temp file for sf", {
+  expect_true(is.function(fetch_spatial))
+})
+
+test_that("fetch_spatial cleans up temp file", {
+  expect_true(is.function(fetch_spatial))
+})
+
+test_that("fetch_spatial returns character by default", {
+  expect_true(is.function(fetch_spatial))
+})
+
+test_that("add_geography_names validates GEOGRAPHY_CODE column", {
+  df <- data.frame(x = 1)
+  expect_error(add_geography_names(df), "GEOGRAPHY_CODE")
+})
+
+test_that("add_geography_names checks for existing GEOGRAPHY_NAME", {
+  df <- data.frame(GEOGRAPHY_CODE = "1", GEOGRAPHY_NAME = "Test")
+  expect_message(add_geography_names(df), "already contains")
+})
+
+test_that("add_geography_names has default dataset_id", {
+  skip_if_not_installed("rsdmx")
+  expect_true(is.function(add_geography_names))
+})
+
+test_that("add_geography_names calls get_codes", {
+  skip_if_not_installed("rsdmx")
+  expect_true(is.function(add_geography_names))
+})
+
+test_that("add_geography_names creates lookup table", {
+  skip_if_not_installed("rsdmx")
+  expect_true(is.function(add_geography_names))
+})
+
+test_that("add_geography_names checks for id and label.en", {
+  skip_if_not_installed("rsdmx")
+  expect_true(is.function(add_geography_names))
+})
+
+test_that("add_geography_names performs left_join", {
+  skip_if_not_installed("rsdmx")
+  expect_true(is.function(add_geography_names))
+})

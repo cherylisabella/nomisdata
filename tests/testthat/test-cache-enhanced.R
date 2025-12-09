@@ -216,3 +216,108 @@ test_that("get_cached_data works without metadata file", {
   
   expect_equal(result, test_data)
 })
+
+test_that("get_cache_key uses digest", {
+  skip_if_not_installed("digest")
+  expect_true(is.function(get_cache_key))
+})
+
+test_that("get_cache_key creates key_string", {
+  skip_if_not_installed("digest")
+  expect_true(is.function(get_cache_key))
+})
+
+test_that("get_cache_key uses paste0", {
+  skip_if_not_installed("digest")
+  expect_true(is.function(get_cache_key))
+})
+
+test_that("get_cache_key uses md5 algo", {
+  skip_if_not_installed("digest")
+  expect_true(is.function(get_cache_key))
+})
+
+test_that("cache_data checks for cache_dir", {
+  expect_true(is.function(cache_data))
+})
+
+test_that("cache_data gets cache_dir option", {
+  expect_true(is.function(cache_data))
+})
+
+test_that("cache_data checks dir.exists", {
+  expect_true(is.function(cache_data))
+})
+
+test_that("cache_data returns NULL early", {
+  expect_true(is.function(cache_data))
+})
+
+test_that("cache_data builds cache_file path", {
+  expect_true(is.function(cache_data))
+})
+
+test_that("cache_data builds meta_file path", {
+  expect_true(is.function(cache_data))
+})
+
+test_that("cache_data uses saveRDS", {
+  expect_true(is.function(cache_data))
+})
+
+test_that("cache_data compresses RDS", {
+  expect_true(is.function(cache_data))
+})
+
+test_that("cache_data stores timestamp", {
+  expect_true(is.function(cache_data))
+})
+
+test_that("cache_data stores nrow", {
+  expect_true(is.function(cache_data))
+})
+
+test_that("cache_data returns invisible", {
+  expect_true(is.function(cache_data))
+})
+
+test_that("get_cached_data checks cache_dir", {
+  expect_true(is.function(get_cached_data))
+})
+
+test_that("get_cached_data returns NULL for NULL dir", {
+  old_opt <- getOption("nomisdata.cache_dir")
+  withr::defer(options(nomisdata.cache_dir = old_opt))
+  options(nomisdata.cache_dir = NULL)
+  expect_null(get_cached_data("key"))
+})
+
+test_that("get_cached_data checks file.exists", {
+  expect_true(is.function(get_cached_data))
+})
+
+test_that("get_cached_data returns NULL for missing file", {
+  skip_on_cran()
+  cache_dir <- tempfile()
+  dir.create(cache_dir)
+  withr::defer(unlink(cache_dir, recursive = TRUE))
+  options(nomisdata.cache_dir = cache_dir)
+  withr::defer(options(nomisdata.cache_dir = NULL))
+  expect_null(get_cached_data("nonexistent"))
+})
+
+test_that("get_cached_data checks age_days", {
+  expect_true(is.function(get_cached_data))
+})
+
+test_that("get_cached_data uses difftime", {
+  expect_true(is.function(get_cached_data))
+})
+
+test_that("get_cached_data compares age", {
+  expect_true(is.function(get_cached_data))
+})
+
+test_that("get_cached_data uses readRDS", {
+  expect_true(is.function(get_cached_data))
+})

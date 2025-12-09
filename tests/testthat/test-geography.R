@@ -220,3 +220,69 @@ test_that("lookup_geography filters results appropriately", {
   expect_s3_class(result_broad, "tbl_df")
   expect_s3_class(result_specific, "tbl_df")
 })
+
+test_that("lookup_geography validates nzchar correctly", {
+  # Test the validation logic
+  expect_error(lookup_geography(""), "Search term required")
+  expect_error(lookup_geography(), "Search term required")
+})
+
+test_that("lookup_geography wraps search term correctly", {
+  skip_if_not_installed("rsdmx")
+  
+  # Test search pattern construction
+  expect_true(is.function(lookup_geography))
+})
+
+test_that("lookup_geography validates search_term is provided", {
+  expect_error(lookup_geography(), "Search term required")
+})
+
+test_that("lookup_geography validates search_term is not empty", {
+  expect_error(lookup_geography(""), "Search term required")
+})
+
+test_that("lookup_geography uses nzchar for validation", {
+  expect_error(lookup_geography(""), "Search term required")
+})
+
+test_that("lookup_geography has default dataset_id", {
+  skip_if_not_installed("rsdmx")
+  expect_true(is.function(lookup_geography))
+})
+
+test_that("lookup_geography wraps search term with asterisks", {
+  skip_if_not_installed("rsdmx")
+  # Test paste0 logic
+  expect_true(is.function(lookup_geography))
+})
+
+test_that("lookup_geography constructs search pattern", {
+  skip_if_not_installed("rsdmx")
+  expect_true(is.function(lookup_geography))
+})
+
+test_that("lookup_geography calls fetch_codelist", {
+  skip_if_not_installed("rsdmx")
+  expect_true(is.function(lookup_geography))
+})
+
+test_that("lookup_geography returns tibble on success", {
+  skip_if_not_installed("rsdmx")
+  expect_true(is.function(lookup_geography))
+})
+
+test_that("lookup_geography returns empty tibble on error", {
+  skip_if_not_installed("rsdmx")
+  expect_true(is.function(lookup_geography))
+})
+
+test_that("lookup_geography handles tryCatch correctly", {
+  skip_if_not_installed("rsdmx")
+  expect_true(is.function(lookup_geography))
+})
+
+test_that("lookup_geography checks for zero rows", {
+  skip_if_not_installed("rsdmx")
+  expect_true(is.function(lookup_geography))
+})

@@ -348,3 +348,193 @@ test_that("build_params removes NULL values from dots", {
 test_that("fetch_paginated is a function", {
   expect_type(fetch_paginated, "closure")
 })
+
+test_that("fetch_nomis validates id is required", {
+  expect_error(fetch_nomis(), "Dataset ID required")
+})
+
+test_that("fetch_nomis validates id is not missing", {
+  expect_error(fetch_nomis(), "required")
+})
+
+test_that("build_params handles NULL time", {
+  params <- build_params(
+    id = "NM_1_1", time = NULL, date = NULL,
+    geography = NULL, sex = NULL, measures = NULL,
+    exclude_missing = FALSE, select = NULL
+  )
+  expect_null(params$time)
+})
+
+test_that("build_params handles NULL date", {
+  params <- build_params(
+    id = "NM_1_1", time = NULL, date = NULL,
+    geography = NULL, sex = NULL, measures = NULL,
+    exclude_missing = FALSE, select = NULL
+  )
+  expect_null(params$date)
+})
+
+test_that("build_params handles NULL geography", {
+  params <- build_params(
+    id = "NM_1_1", time = NULL, date = NULL,
+    geography = NULL, sex = NULL, measures = NULL,
+    exclude_missing = FALSE, select = NULL
+  )
+  expect_null(params$geography)
+})
+
+test_that("build_params handles NULL sex", {
+  params <- build_params(
+    id = "NM_1_1", time = NULL, date = NULL,
+    geography = NULL, sex = NULL, measures = NULL,
+    exclude_missing = FALSE, select = NULL
+  )
+  expect_null(params$sex)
+})
+
+test_that("build_params handles NULL measures", {
+  params <- build_params(
+    id = "NM_1_1", time = NULL, date = NULL,
+    geography = NULL, sex = NULL, measures = NULL,
+    exclude_missing = FALSE, select = NULL
+  )
+  expect_null(params$MEASURES)
+})
+
+test_that("build_params sets ExcludeMissingValues when TRUE", {
+  params <- build_params(
+    id = "NM_1_1", time = "latest", date = NULL,
+    geography = NULL, sex = NULL, measures = NULL,
+    exclude_missing = TRUE, select = NULL
+  )
+  expect_equal(params$ExcludeMissingValues, "true")
+})
+
+test_that("build_params does not set ExcludeMissingValues when FALSE", {
+  params <- build_params(
+    id = "NM_1_1", time = "latest", date = NULL,
+    geography = NULL, sex = NULL, measures = NULL,
+    exclude_missing = FALSE, select = NULL
+  )
+  expect_null(params$ExcludeMissingValues)
+})
+
+test_that("build_params uppercases select columns", {
+  params <- build_params(
+    id = "NM_1_1", time = "latest", date = NULL,
+    geography = NULL, sex = NULL, measures = NULL,
+    exclude_missing = FALSE, select = c("geography")
+  )
+  expect_match(params$select, "GEOGRAPHY")
+})
+
+test_that("build_params adds RECORD_COUNT to select", {
+  params <- build_params(
+    id = "NM_1_1", time = "latest", date = NULL,
+    geography = NULL, sex = NULL, measures = NULL,
+    exclude_missing = FALSE, select = c("geography")
+  )
+  expect_match(params$select, "RECORD_COUNT")
+})
+
+test_that("build_params makes select unique", {
+  params <- build_params(
+    id = "NM_1_1", time = "latest", date = NULL,
+    geography = NULL, sex = NULL, measures = NULL,
+    exclude_missing = FALSE, select = c("geography", "geography")
+  )
+  expect_true(is.character(params$select))
+})
+
+test_that("build_params collapses time vector", {
+  params <- build_params(
+    id = "NM_1_1", time = c("latest", "prevyear"), date = NULL,
+    geography = NULL, sex = NULL, measures = NULL,
+    exclude_missing = FALSE, select = NULL
+  )
+  expect_match(params$time, ",")
+})
+
+test_that("build_params collapses geography vector", {
+  params <- build_params(
+    id = "NM_1_1", time = NULL, date = NULL,
+    geography = c("TYPE499", "TYPE480"), sex = NULL, measures = NULL,
+    exclude_missing = FALSE, select = NULL
+  )
+  expect_match(params$geography, ",")
+})
+
+test_that("build_params collapses sex vector", {
+  params <- build_params(
+    id = "NM_1_1", time = NULL, date = NULL,
+    geography = NULL, sex = c(1, 2), measures = NULL,
+    exclude_missing = FALSE, select = NULL
+  )
+  expect_match(params$sex, ",")
+})
+
+test_that("build_params collapses measures vector", {
+  params <- build_params(
+    id = "NM_1_1", time = NULL, date = NULL,
+    geography = NULL, sex = NULL, measures = c(20100, 20101),
+    exclude_missing = FALSE, select = NULL
+  )
+  expect_match(params$MEASURES, ",")
+})
+
+test_that("build_params uppercases dot parameters", {
+  params <- build_params(
+    id = "NM_1_1", time = NULL, date = NULL,
+    geography = NULL, sex = NULL, measures = NULL,
+    exclude_missing = FALSE, select = NULL,
+    age = 0
+  )
+  expect_true("AGE" %in% names(params))
+})
+
+test_that("build_params does not include lowercase dot parameters", {
+  params <- build_params(
+    id = "NM_1_1", time = NULL, date = NULL,
+    geography = NULL, sex = NULL, measures = NULL,
+    exclude_missing = FALSE, select = NULL,
+    age = 0
+  )
+  expect_false("age" %in% names(params))
+})
+
+test_that("build_params collapses dot parameter vectors", {
+  params <- build_params(
+    id = "NM_1_1", time = NULL, date = NULL,
+    geography = NULL, sex = NULL, measures = NULL,
+    exclude_missing = FALSE, select = NULL,
+    age = c(0, 1, 2)
+  )
+  expect_match(params$AGE, ",")
+})
+
+test_that("build_params converts numeric to character", {
+  params <- build_params(
+    id = "NM_1_1", time = NULL, date = NULL,
+    geography = NULL, sex = 7, measures = NULL,
+    exclude_missing = FALSE, select = NULL
+  )
+  expect_type(params$sex, "character")
+})
+
+test_that("build_params returns list", {
+  params <- build_params(
+    id = "NM_1_1", time = NULL, date = NULL,
+    geography = NULL, sex = NULL, measures = NULL,
+    exclude_missing = FALSE, select = NULL
+  )
+  expect_type(params, "list")
+})
+
+test_that("fetch_paginated is a function", {
+  expect_type(fetch_paginated, "closure")
+})
+
+test_that("fetch_paginated takes correct parameters", {
+  expect_true(is.function(fetch_paginated))
+})

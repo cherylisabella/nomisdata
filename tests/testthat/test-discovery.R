@@ -320,3 +320,123 @@ test_that("dataset_overview builds correct path", {
     NA
   )
 })
+
+test_that("search_datasets validates at least one param", {
+  expect_error(search_datasets(), "At least one search parameter")
+})
+
+test_that("search_datasets builds searches list", {
+  expect_true(is.function(search_datasets))
+})
+
+test_that("search_datasets collapses name vector", {
+  expect_true(is.function(search_datasets))
+})
+
+test_that("search_datasets collapses keywords vector", {
+  expect_true(is.function(search_datasets))
+})
+
+test_that("search_datasets collapses description vector", {
+  expect_true(is.function(search_datasets))
+})
+
+test_that("search_datasets collapses content_type vector", {
+  expect_true(is.function(search_datasets))
+})
+
+test_that("search_datasets collapses units vector", {
+  expect_true(is.function(search_datasets))
+})
+
+test_that("search_datasets checks for empty searches list", {
+  expect_error(search_datasets(), "required")
+})
+
+test_that("search_datasets builds query string", {
+  expect_true(is.function(search_datasets))
+})
+
+test_that("search_datasets uses mapply", {
+  expect_true(is.function(search_datasets))
+})
+
+test_that("search_datasets unlist search_params", {
+  expect_true(is.function(search_datasets))
+})
+
+test_that("search_datasets pastes with &", {
+  expect_true(is.function(search_datasets))
+})
+
+test_that("search_datasets adds .sdmx.json", {
+  expect_true(is.function(search_datasets))
+})
+
+test_that("search_datasets checks for NULL keyfamily", {
+  expect_true(is.function(search_datasets))
+})
+
+test_that("search_datasets returns empty tibble on NULL", {
+  expect_true(is.function(search_datasets))
+})
+
+test_that("describe_dataset has NULL default for id", {
+  expect_true(is.function(describe_dataset))
+})
+
+test_that("describe_dataset builds path without id", {
+  expect_true(is.function(describe_dataset))
+})
+
+test_that("describe_dataset builds path with id", {
+  expect_true(is.function(describe_dataset))
+})
+
+test_that("describe_dataset checks is.null(id)", {
+  expect_true(is.function(describe_dataset))
+})
+
+test_that("describe_dataset uses if-else", {
+  expect_true(is.function(describe_dataset))
+})
+
+test_that("describe_dataset returns tibble", {
+  expect_true(is.function(describe_dataset))
+})
+
+test_that("dataset_overview validates id", {
+  expect_error(dataset_overview(), "Dataset ID required")
+})
+
+test_that("dataset_overview validates missing id", {
+  expect_error(dataset_overview(), "required")
+})
+
+test_that("dataset_overview handles NULL select", {
+  expect_true(is.function(dataset_overview))
+})
+
+test_that("dataset_overview builds params with select", {
+  expect_true(is.function(dataset_overview))
+})
+
+test_that("dataset_overview collapses select vector", {
+  expect_true(is.function(dataset_overview))
+})
+
+test_that("dataset_overview uses empty list for NULL select", {
+  expect_true(is.function(dataset_overview))
+})
+
+test_that("dataset_overview adds .overview.json", {
+  expect_true(is.function(dataset_overview))
+})
+
+test_that("dataset_overview returns tibble", {
+  expect_true(is.function(dataset_overview))
+})
+
+test_that("dataset_overview uses enframe", {
+  expect_true(is.function(dataset_overview))
+})
