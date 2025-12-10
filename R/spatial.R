@@ -15,15 +15,14 @@
 #' @export
 #' 
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' spatial_data <- fetch_spatial(
 #'   "NM_1_1",
 #'   time = "latest",
 #'   geography = "TYPE480",
 #'   measures = 20100,
 #'   sex = 7
-#' )
-#' }
+#' )}
 fetch_spatial <- function(id, time = NULL, date = NULL, geography = NULL, 
                           select = NULL, exclude_missing = FALSE,
                           ..., parse_sf = TRUE) {
@@ -98,7 +97,7 @@ fetch_spatial <- function(id, time = NULL, date = NULL, geography = NULL,
 #' @export
 #' 
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' data <- fetch_nomis("NM_1_1", time = "latest", geography = "TYPE499")
 #' data_with_names <- add_geography_names(data)
 #' }

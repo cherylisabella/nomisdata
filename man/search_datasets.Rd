@@ -30,7 +30,7 @@ Tibble of matching datasets
 Search for Datasets
 }
 \examples{
-\donttest{
+\dontrun{
 search_datasets(name = "*employment*")
 search_datasets(keywords = "census")
 search_datasets(name = "*benefit*", keywords = "claimants")

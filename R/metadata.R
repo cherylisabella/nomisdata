@@ -10,7 +10,7 @@
 #' @export
 #' 
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' get_codes("NM_1_1")
 #' 
 #' get_codes("NM_1_1", "geography")
@@ -176,7 +176,7 @@ get_codes <- function(id, concept = NULL, type = NULL, search = NULL, ...) {
 #' @export
 #' 
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' fetch_codelist("NM_1_1", "geography")
 #' fetch_codelist("NM_1_1", "geography", "*manchester*")
 #' }

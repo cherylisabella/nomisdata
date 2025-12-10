@@ -18,7 +18,7 @@ Tibble with overview information
 Get Dataset Overview
 }
 \examples{
-\donttest{
+\dontrun{
 dataset_overview("NM_1_1")
 dataset_overview("NM_1_1", select = c("Keywords", "Units"))
 }

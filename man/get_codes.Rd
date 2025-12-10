@@ -24,7 +24,7 @@ Tibble with codes and descriptions
 Get Concept Codes
 }
 \examples{
-\donttest{
+\dontrun{
 get_codes("NM_1_1")
 
 get_codes("NM_1_1", "geography")

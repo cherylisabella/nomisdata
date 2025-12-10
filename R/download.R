@@ -17,7 +17,7 @@
 #' @export
 #' 
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' fetch_nomis(
 #'   "NM_1_1",
 #'   time = "latest",

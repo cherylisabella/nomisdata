@@ -39,13 +39,12 @@ KML data as text or sf object (if parse_sf = TRUE)
 Downloads data in KML format with spatial boundaries.
 }
 \examples{
-\donttest{
+\dontrun{
 spatial_data <- fetch_spatial(
   "NM_1_1",
   time = "latest",
   geography = "TYPE480",
   measures = 20100,
   sex = 7
-)
-}
+)}
 }

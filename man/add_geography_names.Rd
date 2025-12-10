@@ -18,7 +18,7 @@ Data frame with GEOGRAPHY_NAME added
 Adds human-readable geography names to data.
 }
 \examples{
-\donttest{
+\dontrun{
 data <- fetch_nomis("NM_1_1", time = "latest", geography = "TYPE499")
 data_with_names <- add_geography_names(data)
 }

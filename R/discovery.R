@@ -10,7 +10,7 @@
 #' @export
 #' 
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' search_datasets(name = "*employment*")
 #' search_datasets(keywords = "census")
 #' search_datasets(name = "*benefit*", keywords = "claimants")
@@ -60,7 +60,7 @@ search_datasets <- function(name = NULL, keywords = NULL, description = NULL,
 #' @export
 #' 
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' describe_dataset("NM_1_1")
 #' all_datasets <- describe_dataset()
 #' }
@@ -91,7 +91,7 @@ describe_dataset <- function(id = NULL) {
 #' @export
 #' 
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' dataset_overview("NM_1_1")
 #' dataset_overview("NM_1_1", select = c("Keywords", "Units"))
 #' }

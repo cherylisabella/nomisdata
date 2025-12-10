@@ -21,7 +21,7 @@ Search for UK geography codes by name. Returns matching
 geographies from local authorities, regions, wards, and other levels.
 }
 \examples{
-\donttest{
+\dontrun{
 lookup_geography("London")
 lookup_geography("Manchester")
 lookup_geography("Birmingham", type = "TYPE464")  # Local authorities only

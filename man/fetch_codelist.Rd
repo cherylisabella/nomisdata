@@ -20,7 +20,7 @@ Tibble of codes
 Fetch Codelist
 }
 \examples{
-\donttest{
+\dontrun{
 fetch_codelist("NM_1_1", "geography")
 fetch_codelist("NM_1_1", "geography", "*manchester*")
 }

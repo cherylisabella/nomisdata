@@ -16,7 +16,7 @@ Tibble with dataset metadata
 Describe Dataset Structure
 }
 \examples{
-\donttest{
+\dontrun{
 describe_dataset("NM_1_1")
 all_datasets <- describe_dataset()
 }
