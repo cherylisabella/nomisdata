@@ -3,11 +3,11 @@ name: pkgcheck
 on:
   workflow_dispatch:
   push:
-  branches:
-  - main
+    branches:
+      - main
 
 jobs:
   pkgcheck:
-  runs-on: ubuntu-latest
-steps:
-  - uses: ropensci-review-tools/pkgcheck-action@main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ropensci-review-tools/pkgcheck-action@main
