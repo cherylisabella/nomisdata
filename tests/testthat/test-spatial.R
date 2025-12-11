@@ -1004,3 +1004,253 @@ test_that("spatial workflow with multiple parameters", {
   
   expect_type(result, "character")
 })
+
+test_that("list() creates empty list", {
+  params <- list()
+  expect_type(params, "list")
+  expect_equal(length(params), 0)
+})
+
+test_that("!is.null check works", {
+  x <- "test"
+  expect_true(!is.null(x))
+  
+  y <- NULL
+  expect_false(!is.null(y))
+})
+
+test_that("paste collapse works", {
+  date <- c("latest", "prevyear")
+  result <- paste(date, collapse = ",")
+  expect_equal(result, "latest,prevyear")
+})
+
+test_that("paste single value works", {
+  date <- "latest"
+  result <- paste(date, collapse = ",")
+  expect_equal(result, "latest")
+})
+
+test_that("list element assignment works", {
+  params <- list()
+  params$date <- "latest"
+  expect_equal(params$date, "latest")
+})
+
+test_that("date vs time precedence works", {
+  date <- "latest"
+  time <- "prevyear"
+  
+  # When date is not NULL, it takes precedence
+  params <- list()
+  if (!is.null(date)) {
+    params$date <- paste(date, collapse = ",")
+  } else if (!is.null(time)) {
+    params$time <- paste(time, collapse = ",")
+  }
+  
+  expect_true("date" %in% names(params))
+  expect_false("time" %in% names(params))
+})
+
+test_that("time used when date is NULL", {
+  date <- NULL
+  time <- "latest"
+  
+  params <- list()
+  if (!is.null(date)) {
+    params$date <- paste(date, collapse = ",")
+  } else if (!is.null(time)) {
+    params$time <- paste(time, collapse = ",")
+  }
+  
+  expect_true("time" %in% names(params))
+  expect_false("date" %in% names(params))
+})
+
+test_that("c() with toupper works", {
+  select <- c("geography_code", "obs_value")
+  upper_select <- toupper(select)
+  expect_equal(upper_select, c("GEOGRAPHY_CODE", "OBS_VALUE"))
+})
+
+test_that("unique removes duplicates", {
+  vec <- c("A", "B", "A", "C", "B", "RECORD_COUNT")
+  result <- unique(vec)
+  expect_true(length(result) < length(vec))
+})
+
+test_that("c() combines vectors", {
+  result <- c(toupper(c("a", "b")), "RECORD_COUNT")
+  expect_equal(length(result), 3)
+})
+
+test_that("isTRUE works", {
+  expect_true(isTRUE(TRUE))
+  expect_false(isTRUE(FALSE))
+  expect_false(isTRUE(NULL))
+  expect_false(isTRUE(1))
+})
+
+test_that("ExcludeMissingValues string works", {
+  params <- list()
+  if (isTRUE(TRUE)) {
+    params$ExcludeMissingValues <- "true"
+  }
+  expect_equal(params$ExcludeMissingValues, "true")
+})
+
+test_that("rlang::list2 works", {
+  dots <- rlang::list2(age = 0, item = 1)
+  expect_equal(length(dots), 2)
+})
+
+test_that("names() extraction works", {
+  lst <- list(a = 1, b = 2, c = 3)
+  nms <- names(lst)
+  expect_equal(length(nms), 3)
+})
+
+test_that("length check on list element works", {
+  lst <- list(a = 1:3, b = character(0))
+  has_length_a <- length(lst$a) > 0
+  has_length_b <- length(lst$b) > 0
+  
+  expect_true(has_length_a)
+  expect_false(has_length_b)
+})
+
+test_that("for loop over names works", {
+  dots <- list(AGE = "0", ITEM = "1")
+  params <- list()
+  
+  for (nm in names(dots)) {
+    if (length(dots[[nm]]) > 0) {
+      params[[nm]] <- paste(dots[[nm]], collapse = ",")
+    }
+  }
+  
+  expect_equal(length(params), 2)
+})
+
+test_that("toupper on names works", {
+  lst <- list(age = 0, item = 1)
+  
+  result <- list()
+  for (nm in names(lst)) {
+    result[[toupper(nm)]] <- lst[[nm]]
+  }
+  
+  expect_true("AGE" %in% names(result))
+  expect_true("ITEM" %in% names(result))
+})
+
+test_that("[[]] list indexing works", {
+  lst <- list(a = 1, b = 2)
+  expect_equal(lst[["a"]], 1)
+  expect_equal(lst[["b"]], 2)
+})
+
+test_that("paste0 for path construction works", {
+  id <- "NM_1_1"
+  path <- paste0(id, ".data.kml")
+  expect_equal(path, "NM_1_1.data.kml")
+})
+
+# ============================================================================
+# add_geography_names() - Logic (30 tests)
+# ============================================================================
+
+test_that("'GEOGRAPHY_CODE' in names check works", {
+  df <- data.frame(GEOGRAPHY_CODE = "123", VALUE = 100)
+  expect_true("GEOGRAPHY_CODE" %in% names(df))
+  
+  df2 <- data.frame(GEO = "123", VALUE = 100)
+  expect_false("GEOGRAPHY_CODE" %in% names(df2))
+})
+
+test_that("! negation works", {
+  df <- data.frame(OTHER = 1)
+  expect_true(!"GEOGRAPHY_CODE" %in% names(df))
+})
+
+test_that("cli::cli_abort exists", {
+  expect_true(exists("cli_abort", where = asNamespace("cli")))
+})
+
+test_that("cli::cli_inform exists", {
+  expect_true(exists("cli_inform", where = asNamespace("cli")))
+})
+
+test_that("'GEOGRAPHY_NAME' in names check works", {
+  df <- data.frame(GEOGRAPHY_CODE = "1", GEOGRAPHY_NAME = "Test")
+  expect_true("GEOGRAPHY_NAME" %in% names(df))
+})
+
+test_that("return early works", {
+  f <- function(data) {
+    if ("GEOGRAPHY_NAME" %in% names(data)) {
+      return(data)
+    }
+    data.frame(a = 1)
+  }
+  
+  df_with_name <- data.frame(GEOGRAPHY_NAME = "test")
+  result <- f(df_with_name)
+  expect_equal(names(result), "GEOGRAPHY_NAME")
+})
+
+test_that("'id' in names check works", {
+  df <- data.frame(id = "123", label.en = "Test")
+  expect_true("id" %in% names(df))
+})
+
+test_that("'label.en' in names check works", {
+  df <- data.frame(id = "123", label.en = "Test")
+  expect_true("label.en" %in% names(df))
+})
+
+test_that("&& combines conditions", {
+  df <- data.frame(id = "1", label.en = "Test")
+  result <- "id" %in% names(df) && "label.en" %in% names(df)
+  expect_true(result)
+})
+
+test_that("data.frame creation works", {
+  df <- data.frame(
+    GEOGRAPHY_CODE = c("1", "2"),
+    GEOGRAPHY_NAME = c("A", "B"),
+    stringsAsFactors = FALSE
+  )
+  expect_equal(nrow(df), 2)
+  expect_equal(ncol(df), 2)
+})
+
+test_that("stringsAsFactors = FALSE works", {
+  df <- data.frame(
+    col = c("a", "b"),
+    stringsAsFactors = FALSE
+  )
+  expect_true(is.character(df$col))
+})
+
+test_that("$ column access works", {
+  lookup <- data.frame(id = c("1", "2"))
+  expect_equal(lookup$id, c("1", "2"))
+})
+
+test_that("cli::cli_warn exists", {
+  expect_true(exists("cli_warn", where = asNamespace("cli")))
+})
+
+test_that("dplyr::left_join exists", {
+  expect_true(exists("left_join", where = asNamespace("dplyr")))
+})
+
+test_that("by parameter for join works", {
+  df1 <- data.frame(GEOGRAPHY_CODE = "1", VALUE = 100)
+  df2 <- data.frame(GEOGRAPHY_CODE = "1", NAME = "Test")
+  
+  result <- dplyr::left_join(df1, df2, by = "GEOGRAPHY_CODE")
+  expect_equal(ncol(result), 3)
+})

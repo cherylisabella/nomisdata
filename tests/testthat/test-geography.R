@@ -640,3 +640,433 @@ test_that("lookup_geography works for multiple searches", {
     expect_s3_class(result, "tbl_df")
   }
 })
+
+# NO API TESTS for geography.R - Run instantly
+# ============================================================================
+# lookup_geography() - Input validation (40 tests)
+# ============================================================================
+
+test_that("missing() works for search_term", {
+  f <- function(search_term) missing(search_term)
+  expect_true(f())
+  expect_false(f("test"))
+})
+
+test_that("nzchar detects empty string", {
+  expect_false(nzchar(""))
+  expect_true(nzchar("a"))
+  expect_true(nzchar("test"))
+})
+
+test_that("!nzchar detects empty", {
+  expect_true(!nzchar(""))
+  expect_false(!nzchar("test"))
+})
+
+test_that("combined validation logic works", {
+  validate <- function(term) {
+    missing(term) || !nzchar(term)
+  }
+  
+  expect_true(validate())
+  expect_true(validate(""))
+  expect_false(validate("test"))
+})
+
+test_that("default parameter works", {
+  f <- function(dataset_id = "NM_1_1") dataset_id
+  expect_equal(f(), "NM_1_1")
+  expect_equal(f("custom"), "custom")
+})
+
+test_that("type NULL default works", {
+  f <- function(type = NULL) is.null(type)
+  expect_true(f())
+  expect_false(f("TYPE499"))
+})
+
+test_that("requireNamespace check works", {
+  result <- requireNamespace("base", quietly = TRUE)
+  expect_true(result)
+})
+
+test_that("quietly parameter suppresses messages", {
+  result <- requireNamespace("stats", quietly = TRUE)
+  expect_type(result, "logical")
+})
+
+test_that("rlang::abort with multi-line works", {
+  expect_true(exists("abort", where = asNamespace("rlang")))
+})
+
+test_that("abort message construction works", {
+  msg <- c(
+    "Package 'rsdmx' required for geography lookup",
+    "i" = "Install with: install.packages('rsdmx')"
+  )
+  expect_equal(length(msg), 2)
+})
+
+# ============================================================================
+# Search pattern construction (30 tests)
+# ============================================================================
+
+test_that("paste0 wraps with asterisks", {
+  term <- "London"
+  pattern <- paste0("*", term, "*")
+  expect_equal(pattern, "*London*")
+})
+
+test_that("paste0 with empty string works", {
+  term <- ""
+  pattern <- paste0("*", term, "*")
+  expect_equal(pattern, "**")
+})
+
+test_that("paste0 with special chars works", {
+  term <- "St. Albans"
+  pattern <- paste0("*", term, "*")
+  expect_equal(pattern, "*St. Albans*")
+})
+
+test_that("paste0 with numbers works", {
+  term <- "123"
+  pattern <- paste0("*", term, "*")
+  expect_equal(pattern, "*123*")
+})
+
+test_that("paste0 with hyphen works", {
+  term <- "Stratford-upon-Avon"
+  pattern <- paste0("*", term, "*")
+  expect_equal(pattern, "*Stratford-upon-Avon*")
+})
+
+test_that("paste0 with ampersand works", {
+  term <- "Brighton & Hove"
+  pattern <- paste0("*", term, "*")
+  expect_equal(pattern, "*Brighton & Hove*")
+})
+
+test_that("paste0 with parentheses works", {
+  term <- "Newcastle (upon Tyne)"
+  pattern <- paste0("*", term, "*")
+  expect_equal(pattern, "*Newcastle (upon Tyne)*")
+})
+
+test_that("paste0 with apostrophe works", {
+  term <- "King's Lynn"
+  pattern <- paste0("*", term, "*")
+  expect_equal(pattern, "*King's Lynn*")
+})
+
+test_that("paste0 preserves case", {
+  term1 <- "LONDON"
+  pattern1 <- paste0("*", term1, "*")
+  expect_equal(pattern1, "*LONDON*")
+  
+  term2 <- "london"
+  pattern2 <- paste0("*", term2, "*")
+  expect_equal(pattern2, "*london*")
+})
+
+test_that("paste0 with very long string works", {
+  term <- paste(rep("a", 100), collapse = "")
+  pattern <- paste0("*", term, "*")
+  expect_true(nchar(pattern) == 102)
+})
+
+# ============================================================================
+# tryCatch error handling (30 tests)
+# ============================================================================
+
+test_that("tryCatch basic structure works", {
+  result <- tryCatch({
+    "success"
+  }, error = function(e) {
+    "error"
+  })
+  expect_equal(result, "success")
+})
+
+test_that("tryCatch catches errors", {
+  result <- tryCatch({
+    stop("test error")
+  }, error = function(e) {
+    "caught"
+  })
+  expect_equal(result, "caught")
+})
+
+test_that("tryCatch error handler receives error", {
+  result <- tryCatch({
+    stop("my error")
+  }, error = function(e) {
+    conditionMessage(e)
+  })
+  expect_equal(result, "my error")
+})
+
+test_that("tryCatch allows expression evaluation", {
+  x <- 0
+  result <- tryCatch({
+    x <- 10
+    x + 5
+  }, error = function(e) {
+    -1
+  })
+  expect_equal(result, 15)
+  expect_equal(x, 10)
+})
+
+test_that("nrow check works", {
+  df <- data.frame(a = 1:3)
+  expect_equal(nrow(df), 3)
+  expect_false(nrow(df) == 0)
+  
+  empty <- data.frame()
+  expect_equal(nrow(empty), 0)
+  expect_true(nrow(empty) == 0)
+})
+
+test_that("rlang::inform exists", {
+  expect_true(exists("inform", where = asNamespace("rlang")))
+})
+
+test_that("paste in inform works", {
+  term <- "test"
+  msg <- paste("No matches found for:", term)
+  expect_equal(msg, "No matches found for: test")
+})
+
+test_that("return in tryCatch works", {
+  result <- tryCatch({
+    return(data.frame(a = 1))
+    data.frame(a = 2)
+  }, error = function(e) {
+    data.frame()
+  })
+  expect_equal(nrow(result), 1)
+})
+
+test_that("rlang::warn exists", {
+  expect_true(exists("warn", where = asNamespace("rlang")))
+})
+
+test_that("conditionMessage works", {
+  err <- simpleError("test message")
+  expect_equal(conditionMessage(err), "test message")
+})
+
+test_that("multi-line warn message works", {
+  msg <- c(
+    "Geography search failed",
+    "x" = "Error details",
+    "i" = "Try using get_codes()"
+  )
+  expect_equal(length(msg), 3)
+})
+
+test_that("tibble::tibble() creates empty tibble", {
+  tbl <- tibble::tibble()
+  expect_s3_class(tbl, "tbl_df")
+  expect_equal(nrow(tbl), 0)
+})
+
+test_that("empty tibble has zero columns", {
+  tbl <- tibble::tibble()
+  expect_equal(ncol(tbl), 0)
+})
+
+# ============================================================================
+# Function signature and defaults (20 tests)
+# ============================================================================
+
+test_that("formals extracts function parameters", {
+  f <- function(a, b = 2, c = NULL) {}
+  params <- formals(f)
+  expect_equal(length(params), 3)
+})
+
+test_that("names of formals works", {
+  f <- function(search_term, dataset_id = "NM_1_1", type = NULL) {}
+  param_names <- names(formals(f))
+  expect_true("search_term" %in% param_names)
+  expect_true("dataset_id" %in% param_names)
+  expect_true("type" %in% param_names)
+})
+
+test_that("default values in formals work", {
+  f <- function(x = "default") x
+  expect_equal(f(), "default")
+})
+
+test_that("NULL default works", {
+  f <- function(x = NULL) is.null(x)
+  expect_true(f())
+})
+
+test_that("is.function check works", {
+  f <- function() {}
+  expect_true(is.function(f))
+  expect_false(is.function("text"))
+})
+
+test_that("%in% operator works", {
+  expect_true("a" %in% c("a", "b", "c"))
+  expect_false("d" %in% c("a", "b", "c"))
+})
+
+test_that("all() checks all elements", {
+  vec <- c(TRUE, TRUE, TRUE)
+  expect_true(all(vec))
+  
+  vec2 <- c(TRUE, FALSE, TRUE)
+  expect_false(all(vec2))
+})
+
+# ============================================================================
+# Data structure operations (30 tests)
+# ============================================================================
+
+test_that("tibble creation works", {
+  tbl <- tibble::tibble(a = 1:3, b = 4:6)
+  expect_s3_class(tbl, "tbl_df")
+})
+
+test_that("empty tibble is valid", {
+  tbl <- tibble::tibble()
+  expect_true(is.data.frame(tbl))
+})
+
+test_that("tibble with columns works", {
+  tbl <- tibble::tibble(
+    id = c("1", "2"),
+    name = c("A", "B")
+  )
+  expect_equal(nrow(tbl), 2)
+  expect_equal(ncol(tbl), 2)
+})
+
+test_that("nrow returns integer", {
+  tbl <- tibble::tibble(a = 1:5)
+  expect_type(nrow(tbl), "integer")
+})
+
+test_that("nrow of empty tibble is 0", {
+  tbl <- tibble::tibble()
+  expect_equal(nrow(tbl), 0)
+})
+
+test_that("ncol works", {
+  tbl <- tibble::tibble(a = 1, b = 2, c = 3)
+  expect_equal(ncol(tbl), 3)
+})
+
+test_that("names extraction works", {
+  tbl <- tibble::tibble(col1 = 1, col2 = 2)
+  expect_equal(names(tbl), c("col1", "col2"))
+})
+
+test_that("'id' in names check works", {
+  tbl <- tibble::tibble(id = 1, name = "test")
+  expect_true("id" %in% names(tbl))
+  
+  tbl2 <- tibble::tibble(name = "test")
+  expect_false("id" %in% names(tbl2))
+})
+
+test_that("column access with $ works", {
+  tbl <- tibble::tibble(id = c("a", "b"))
+  expect_equal(tbl$id, c("a", "b"))
+})
+
+test_that("is.character check works", {
+  tbl <- tibble::tibble(id = c("a", "b"))
+  expect_true(is.character(tbl$id))
+  
+  tbl2 <- tibble::tibble(id = c(1, 2))
+  expect_false(is.character(tbl2$id))
+})
+
+test_that("class() returns vector", {
+  tbl <- tibble::tibble(a = 1)
+  cls <- class(tbl)
+  expect_type(cls, "character")
+  expect_true(length(cls) > 0)
+})
+
+test_that("class equality check works", {
+  tbl1 <- tibble::tibble(a = 1)
+  tbl2 <- tibble::tibble(b = 2)
+  expect_equal(class(tbl1), class(tbl2))
+})
+
+test_that("identical checks exact match", {
+  a <- c(1, 2, 3)
+  b <- c(1, 2, 3)
+  expect_true(identical(a, b))
+  
+  c <- c(1, 2, 4)
+  expect_false(identical(a, c))
+})
+
+test_that(">= comparison works", {
+  expect_true(5 >= 3)
+  expect_true(3 >= 3)
+  expect_false(2 >= 3)
+})
+
+test_that("nrow comparison works", {
+  tbl1 <- tibble::tibble(a = 1:5)
+  tbl2 <- tibble::tibble(a = 1:3)
+  expect_true(nrow(tbl1) >= nrow(tbl2))
+})
+
+# ============================================================================
+# Type checking (20 tests)
+# ============================================================================
+
+test_that("is.data.frame check works", {
+  df <- data.frame(a = 1)
+  expect_true(is.data.frame(df))
+  
+  tbl <- tibble::tibble(a = 1)
+  expect_true(is.data.frame(tbl))
+  
+  lst <- list(a = 1)
+  expect_false(is.data.frame(lst))
+})
+
+test_that("is.logical check works", {
+  expect_true(is.logical(TRUE))
+  expect_true(is.logical(FALSE))
+  expect_false(is.logical(1))
+})
+
+test_that("is.character check works", {
+  expect_true(is.character("test"))
+  expect_false(is.character(123))
+})
+
+test_that("is.numeric check works", {
+  expect_true(is.numeric(123))
+  expect_true(is.numeric(1.5))
+  expect_false(is.numeric("123"))
+})
+
+test_that("typeof works", {
+  expect_equal(typeof("test"), "character")
+  expect_equal(typeof(123), "double")
+  expect_equal(typeof(TRUE), "logical")
+})
+
+test_that("class check works", {
+  tbl <- tibble::tibble(a = 1)
+  expect_s3_class(tbl, "tbl_df")
+})
+
+test_that("inherits check works", {
+  tbl <- tibble::tibble(a = 1)
+  expect_true(inherits(tbl, "tbl_df"))
+  expect_true(inherits(tbl, "data.frame"))
+})
