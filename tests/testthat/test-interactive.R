@@ -55,3 +55,21 @@ test_that("explore_dataset requires interactive session", {
     "interactive session"
   )
 })
+
+test_that("browse_dataset handles all page types", {
+  pages <- c("dataset", "download", "metadata")
+  
+  for (page in pages) {
+    expect_message(
+      result <- browse_dataset("NM_1_1", page = page),
+      "URL"
+    )
+    expect_true(result)
+  }
+})
+
+test_that("explore_dataset returns invisibly in non-interactive", {
+  skip_if(interactive())
+  
+  expect_error(explore_dataset("NM_1_1"), "interactive")
+})

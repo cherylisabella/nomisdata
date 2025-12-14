@@ -13,8 +13,6 @@ cache_data <- function(cache_key, data) {
   cache_dir <- getOption("nomisdata.cache_dir")
   if (is.null(cache_dir)) cache_dir <- get_nomis_cache_dir()
   if (is.null(cache_dir) || !dir.exists(dirname(cache_dir))) return(invisible(NULL))
-  if (is.null(cache_dir)) cache_dir <- get_nomis_cache_dir()
-  if (is.null(cache_dir)) return(invisible(NULL))
   
   cache_file <- file.path(cache_dir, paste0(cache_key, ".rds"))
   saveRDS(data, cache_file, compress = TRUE)
@@ -32,8 +30,6 @@ get_cached_data <- function(cache_key, max_age_days = 30) {
   cache_dir <- getOption("nomisdata.cache_dir")
   if (is.null(cache_dir)) cache_dir <- get_nomis_cache_dir()
   if (is.null(cache_dir) || !dir.exists(dirname(cache_dir))) return(invisible(NULL))
-  if (is.null(cache_dir)) cache_dir <- get_nomis_cache_dir()
-  if (is.null(cache_dir)) return(NULL)
   
   cache_file <- file.path(cache_dir, paste0(cache_key, ".rds"))
   meta_file <- file.path(cache_dir, paste0(cache_key, "_meta.rds"))

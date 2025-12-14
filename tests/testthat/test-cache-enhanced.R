@@ -321,3 +321,61 @@ test_that("get_cached_data compares age", {
 test_that("get_cached_data uses readRDS", {
   expect_true(is.function(get_cached_data))
 })
+
+test_that("cache_data executes all reachable lines", {
+  skip_on_cran()
+  
+  cache_dir <- tempfile("cache")
+  dir.create(cache_dir, recursive = TRUE)
+  on.exit(unlink(cache_dir, recursive = TRUE), add = TRUE)
+  
+  options(nomisdata.cache_dir = cache_dir)
+  on.exit(options(nomisdata.cache_dir = NULL), add = TRUE)
+  
+  # Test normal flow
+  test_data <- data.frame(x = 1:10, y = letters[1:10])
+  result <- cache_data("test_key", test_data)
+  
+  expect_true(file.exists(result))
+  expect_true(file.exists(file.path(cache_dir, "test_key_meta.rds")))
+  
+  # Verify metadata
+  meta <- readRDS(file.path(cache_dir, "test_key_meta.rds"))
+  expect_equal(meta$rows, 10)
+  expect_s3_class(meta$timestamp, "POSIXct")
+})
+
+test_that("get_cached_data executes all reachable lines", {
+  skip_on_cran()
+  
+  cache_dir <- tempfile("cache")
+  dir.create(cache_dir, recursive = TRUE)
+  on.exit(unlink(cache_dir, recursive = TRUE), add = TRUE)
+  
+  options(nomisdata.cache_dir = cache_dir)
+  on.exit(options(nomisdata.cache_dir = NULL), add = TRUE)
+  
+  # Create cache
+  test_data <- data.frame(a = 1:5, b = 6:10)
+  cache_data("key1", test_data)
+  
+  # Test retrieval with metadata
+  expect_message(result <- get_cached_data("key1"), "Using cached")
+  expect_equal(result, test_data)
+  
+  # Test retrieval without metadata (delete meta file)
+  cache_data("key2", test_data)
+  unlink(file.path(cache_dir, "key2_meta.rds"))
+  result <- get_cached_data("key2")
+  expect_equal(result, test_data)
+  
+  # Test old cache
+  cache_data("key3", test_data)
+  meta_file <- file.path(cache_dir, "key3_meta.rds")
+  meta <- readRDS(meta_file)
+  meta$timestamp <- Sys.time() - as.difftime(35, units = "days")
+  saveRDS(meta, meta_file)
+  
+  expect_message(result <- get_cached_data("key3", 30), "35 days old")
+  expect_null(result)
+})
