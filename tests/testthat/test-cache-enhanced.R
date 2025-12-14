@@ -379,3 +379,117 @@ test_that("get_cached_data executes all reachable lines", {
   expect_message(result <- get_cached_data("key3", 30), "35 days old")
   expect_null(result)
 })
+
+test_that("get_cached_data handles age at exact boundary", {
+  skip_on_cran()
+  
+  cache_dir <- tempfile()
+  dir.create(cache_dir)
+  withr::defer(unlink(cache_dir, recursive = TRUE))
+  
+  options(nomisdata.cache_dir = cache_dir)
+  withr::defer(options(nomisdata.cache_dir = NULL))
+  
+  test_data <- data.frame(x = 1:3)
+  cache_data("boundary", test_data)
+  
+  # Set to 29.99 days (just under 30)
+  meta_file <- file.path(cache_dir, "boundary_meta.rds")
+  meta <- readRDS(meta_file)
+  meta$timestamp <- Sys.time() - as.difftime(29.99, units = "days")
+  saveRDS(meta, meta_file)
+  
+  # Should be valid
+  result <- get_cached_data("boundary", max_age_days = 30)
+  expect_equal(result, test_data)
+  
+  # Set to 30.01 days (just over 30)
+  meta$timestamp <- Sys.time() - as.difftime(30.01, units = "days")
+  saveRDS(meta, meta_file)
+  
+  # Should be expired
+  expect_message(
+    result <- get_cached_data("boundary", max_age_days = 30),
+    "30 days old"
+  )
+  expect_null(result)
+})
+
+test_that("cache_data stores data with metadata", {
+  skip_on_cran()
+  
+  cache_dir <- tempfile()
+  dir.create(cache_dir)
+  withr::defer(unlink(cache_dir, recursive = TRUE))
+  
+  options(nomisdata.cache_dir = cache_dir)
+  withr::defer(options(nomisdata.cache_dir = NULL))
+  
+  test_data <- data.frame(x = 1:10, y = letters[1:10])
+  result <- cache_data("test_key", test_data)
+  
+  expect_true(file.exists(result))
+  expect_true(file.exists(file.path(cache_dir, "test_key_meta.rds")))
+  
+  meta <- readRDS(file.path(cache_dir, "test_key_meta.rds"))
+  expect_equal(meta$rows, 10)
+})
+
+test_that("get_cached_data retrieves cached data with message", {
+  skip_on_cran()
+  
+  cache_dir <- tempfile()
+  dir.create(cache_dir)
+  withr::defer(unlink(cache_dir, recursive = TRUE))
+  
+  options(nomisdata.cache_dir = cache_dir)
+  withr::defer(options(nomisdata.cache_dir = NULL))
+  
+  test_data <- data.frame(a = 1:5, b = 6:10)
+  cache_data("key1", test_data)
+  
+  expect_message(result <- get_cached_data("key1"), "Using cached")
+  expect_equal(result, test_data)
+})
+
+test_that("get_cached_data works without metadata file", {
+  skip_on_cran()
+  
+  cache_dir <- tempfile()
+  dir.create(cache_dir)
+  withr::defer(unlink(cache_dir, recursive = TRUE))
+  
+  options(nomisdata.cache_dir = cache_dir)
+  withr::defer(options(nomisdata.cache_dir = NULL))
+  
+  test_data <- data.frame(x = 1:3)
+  cache_data("key2", test_data)
+  
+  # Delete metadata
+  unlink(file.path(cache_dir, "key2_meta.rds"))
+  
+  result <- get_cached_data("key2")
+  expect_equal(result, test_data)
+})
+
+test_that("get_cached_data rejects old cache", {
+  skip_on_cran()
+  
+  cache_dir <- tempfile()
+  dir.create(cache_dir)
+  withr::defer(unlink(cache_dir, recursive = TRUE))
+  
+  options(nomisdata.cache_dir = cache_dir)
+  withr::defer(options(nomisdata.cache_dir = NULL))
+  
+  test_data <- data.frame(x = 1:3)
+  cache_data("old_key", test_data)
+  
+  meta_file <- file.path(cache_dir, "old_key_meta.rds")
+  meta <- readRDS(meta_file)
+  meta$timestamp <- Sys.time() - as.difftime(35, units = "days")
+  saveRDS(meta, meta_file)
+  
+  expect_message(result <- get_cached_data("old_key", 30), "35 days old")
+  expect_null(result)
+})

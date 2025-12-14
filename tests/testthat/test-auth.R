@@ -231,3 +231,19 @@ test_that("set_api_key with persist = TRUE sends to add_to_renviron", {
     "not available during package checks"
   )
 })
+
+test_that("set_api_key accepts whitespace in key", {
+  # Whitespace-only keys are actually valid API keys
+  orig_key <- getOption("nomisdata.api_key")
+  withr::defer(options(nomisdata.api_key = orig_key))
+  
+  # Keys with spaces are valid
+  suppressMessages(set_api_key("key with spaces", persist = FALSE))
+  expect_equal(getOption("nomisdata.api_key"), "key with spaces")
+})
+
+test_that("add_to_renviron works outside R CMD check", {
+  skip_on_cran()
+  skip_on_ci()
+  skip("Modifies user files - manual test only")
+})

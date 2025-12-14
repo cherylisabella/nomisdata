@@ -73,3 +73,21 @@ test_that("explore_dataset returns invisibly in non-interactive", {
   
   expect_error(explore_dataset("NM_1_1"), "interactive")
 })
+
+test_that("browse_dataset constructs correct URLs for all pages", {
+  pages <- c("dataset", "download", "metadata")
+  
+  for (page in pages) {
+    expect_message(
+      result <- browse_dataset("NM_1_1", page = page),
+      "URL"
+    )
+    expect_true(result)
+  }
+})
+
+test_that("browse_dataset returns invisible TRUE", {
+  result <- suppressMessages(browse_dataset("NM_1_1"))
+  expect_true(result)
+  expect_invisible(browse_dataset("NM_1_1"))
+})

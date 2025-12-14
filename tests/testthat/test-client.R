@@ -547,3 +547,80 @@ test_that("fetch_nomis handles long parameter lists", {
   
   expect_s3_class(result, "tbl_df")
 })
+
+test_that("fetch_nomis handles multiple parameter types", {
+  skip_if_no_api()
+  skip_on_cran()
+  
+  # Test with vector parameters
+  result <- fetch_nomis(
+    "NM_1_1",
+    time = "latest",
+    geography = c("2092957697", "2092957698"),
+    measures = c(20100, 20101)
+  )
+  
+  expect_s3_class(result, "tbl_df")
+})
+
+test_that("fetch_nomis handles select parameter correctly", {
+  skip_if_no_api()
+  skip_on_cran()
+  
+  result <- fetch_nomis(
+    "NM_1_1",
+    time = "latest",
+    geography = "TYPE499",
+    measures = 20100,
+    select = c("GEOGRAPHY_CODE", "OBS_VALUE")
+  )
+  
+  expect_s3_class(result, "tbl_df")
+  # Selected columns should be present
+  expect_true(any(c("GEOGRAPHY_CODE", "OBS_VALUE") %in% names(result)))
+})
+
+test_that("fetch_nomis returns consistent structure", {
+  skip_if_no_api()
+  skip_on_cran()
+  
+  result <- fetch_nomis(
+    "NM_1_1",
+    time = "latest",
+    geography = "TYPE499",
+    measures = 20100
+  )
+  
+  expect_true(is.data.frame(result))
+  expect_s3_class(result, "tbl_df")
+  expect_true(ncol(result) > 0)
+})
+
+test_that("fetch_nomis handles vector parameters", {
+  skip_if_no_api()
+  skip_on_cran()
+  
+  result <- fetch_nomis(
+    "NM_1_1",
+    time = "latest",
+    geography = c("2092957697", "2092957698"),
+    measures = 20100
+  )
+  
+  expect_s3_class(result, "tbl_df")
+})
+
+test_that("fetch_nomis handles select parameter", {
+  skip_if_no_api()
+  skip_on_cran()
+  
+  result <- fetch_nomis(
+    "NM_1_1",
+    time = "latest",
+    geography = "TYPE499",
+    measures = 20100,
+    select = c("GEOGRAPHY_CODE", "OBS_VALUE")
+  )
+  
+  expect_s3_class(result, "tbl_df")
+})
