@@ -1,118 +1,167 @@
-# Tests for caching functionality
-
-test_that("enable_cache sets cache directory", {
-  skip_on_cran()
-  skip_if(nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_")))
-  
-  temp_dir <- file.path(tempdir(), "nomisdata_test_enable")
-  if (dir.exists(temp_dir)) unlink(temp_dir, recursive = TRUE)
-  
-  orig_cache <- getOption("nomisdata.cache_dir")
-  on.exit({
-    options(nomisdata.cache_dir = orig_cache)
-    if (dir.exists(temp_dir)) unlink(temp_dir, recursive = TRUE)
+# get_nomis_cache_dir tests
+test_that("get_nomis_cache_dir uses tempdir during R CMD check", {
+  withr::with_envvar(c("_R_CHECK_PACKAGE_NAME_" = "nomisdata"), {
+    path <- get_nomis_cache_dir()
+    expect_match(path, tempdir(), fixed = TRUE)
+    expect_match(path, "nomisdata")
   })
-  
-  enable_cache(temp_dir)
-  
-  expect_equal(getOption("nomisdata.cache_dir"), temp_dir)
-  expect_true(dir.exists(temp_dir))
 })
 
-test_that("enable_cache creates directory if needed", {
-  skip_on_cran()
-  skip_if(nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_")))
-  
-  temp_dir <- file.path(tempdir(), "nomisdata_test_create")
-  if (dir.exists(temp_dir)) unlink(temp_dir, recursive = TRUE)
-  
-  orig_cache <- getOption("nomisdata.cache_dir")
-  on.exit({
-    options(nomisdata.cache_dir = orig_cache)
-    if (dir.exists(temp_dir)) unlink(temp_dir, recursive = TRUE)
+test_that("get_nomis_cache_dir respects NOT_CRAN=false", {
+  withr::with_envvar(c("NOT_CRAN" = "false"), {
+    path <- get_nomis_cache_dir()
+    expect_match(path, tempdir(), fixed = TRUE)
   })
-  
-  enable_cache(temp_dir)
-  
-  cache_dir <- getOption("nomisdata.cache_dir")
-  expect_type(cache_dir, "character")
-  expect_true(dir.exists(cache_dir))
 })
 
-test_that("clear_cache removes cache directory", {
-  skip_on_cran()
-  skip_if(nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_")))
-  
-  temp_dir <- file.path(tempdir(), "nomisdata_test_clear")
-  if (dir.exists(temp_dir)) unlink(temp_dir, recursive = TRUE)
-  dir.create(temp_dir, recursive = TRUE)
-  
-  orig_cache <- getOption("nomisdata.cache_dir")
-  on.exit({
-    options(nomisdata.cache_dir = orig_cache)
-    if (dir.exists(temp_dir)) unlink(temp_dir, recursive = TRUE)
+test_that("get_nomis_cache_dir uses NOMISDATA_CACHE_DIR env var", {
+  withr::with_envvar(
+    c("NOMISDATA_CACHE_DIR" = "/custom/path", "_R_CHECK_PACKAGE_NAME_" = ""),
+    {
+      path <- get_nomis_cache_dir()
+      expect_equal(path, "/custom/path")
+    }
+  )
+})
+
+test_that("get_nomis_cache_dir uses R_user_dir on R >= 4.0", {
+  skip_if(getRversion() < "4.0.0")
+  withr::with_envvar(
+    c("NOMISDATA_CACHE_DIR" = "", "_R_CHECK_PACKAGE_NAME_" = ""),
+    {
+      path <- get_nomis_cache_dir()
+      expect_type(path, "character")
+      expect_true(nchar(path) > 0)
+    }
+  )
+})
+
+test_that("get_nomis_cache_dir falls back to tempdir", {
+  withr::with_envvar(
+    c("NOMISDATA_CACHE_DIR" = "", "_R_CHECK_PACKAGE_NAME_" = ""),
+    {
+      path <- get_nomis_cache_dir()
+      expect_type(path, "character")
+      expect_true(nchar(path) > 0)
+    }
+  )
+})
+
+# enable_cache tests
+test_that("enable_cache sets option", {
+  withr::local_options(nomisdata.cache_dir = NULL)
+  withr::with_envvar(c("_R_CHECK_PACKAGE_NAME_" = ""), {
+    temp <- tempfile()
+    result <- enable_cache(temp)
+    expect_equal(getOption("nomisdata.cache_dir"), temp)
   })
+})
+
+test_that("enable_cache uses tempdir during check", {
+  withr::local_options(nomisdata.cache_dir = NULL)
+  withr::with_envvar(c("_R_CHECK_PACKAGE_NAME_" = "nomisdata"), {
+    result <- enable_cache("/some/path")
+    expect_match(result, tempdir(), fixed = TRUE)
+  })
+})
+
+test_that("enable_cache handles NULL path", {
+  withr::local_options(nomisdata.cache_dir = NULL)
+  withr::with_envvar(c("_R_CHECK_PACKAGE_NAME_" = ""), {
+    result <- enable_cache(NULL)
+    expect_type(result, "character")
+  })
+})
+
+test_that("enable_cache creates dir when not in check", {
+  withr::local_options(nomisdata.cache_dir = NULL)
+  withr::with_envvar(c("_R_CHECK_PACKAGE_NAME_" = ""), {
+    temp <- tempfile()
+    enable_cache(temp)
+    expect_true(dir.exists(temp))
+    unlink(temp, recursive = TRUE)
+  })
+})
+
+test_that("enable_cache skips creation during check", {
+  withr::local_options(nomisdata.cache_dir = NULL)
+  withr::with_envvar(c("_R_CHECK_PACKAGE_NAME_" = "nomisdata"), {
+    temp <- tempfile()
+    enable_cache(temp)
+    expect_false(dir.exists(temp))
+  })
+})
+
+# clear_cache tests
+test_that("clear_cache removes directory", {
+  withr::local_options(nomisdata.cache_dir = NULL)
+  temp <- tempfile()
+  dir.create(temp)
+  options(nomisdata.cache_dir = temp)
   
-  options(nomisdata.cache_dir = temp_dir)
   clear_cache()
+  expect_false(dir.exists(temp))
+})
+
+test_that("clear_cache handles NULL cache_dir", {
+  withr::local_options(nomisdata.cache_dir = NULL)
+  expect_silent(clear_cache())
+})
+
+test_that("clear_cache handles nonexistent directory", {
+  withr::local_options(nomisdata.cache_dir = "/fake/path")
+  expect_silent(clear_cache())
+})
+
+test_that("clear_cache returns invisible TRUE", {
+  withr::local_options(nomisdata.cache_dir = NULL)
+  result <- clear_cache()
+  expect_true(result)
+})
+
+test_that("clear_cache messages when clearing", {
+  temp <- tempfile()
+  dir.create(temp)
+  withr::local_options(nomisdata.cache_dir = temp)
   
-  expect_false(dir.exists(temp_dir))
+  expect_message(clear_cache(), "cleared")
+})
+
+# Integration with cache-enhanced.R functions
+test_that("get_cache_key creates deterministic hash", {
+  key1 <- get_cache_key("NM_1_1", list(time = "latest"))
+  key2 <- get_cache_key("NM_1_1", list(time = "latest"))
+  expect_identical(key1, key2)
+  expect_equal(nchar(key1), 32)
 })
 
 test_that("cache_data and get_cached_data work together", {
-  skip_on_cran()
-  skip_if(nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_")))
+  temp <- tempfile()
+  dir.create(temp)
+  withr::local_options(nomisdata.cache_dir = temp)
+  on.exit(unlink(temp, recursive = TRUE))
   
-  temp_dir <- file.path(tempdir(), "nomisdata_test_cache_ops")
-  if (dir.exists(temp_dir)) unlink(temp_dir, recursive = TRUE)
-  dir.create(temp_dir, recursive = TRUE, showWarnings = FALSE)
+  test_data <- data.frame(x = 1:3)
+  cache_data("test", test_data)
   
-  orig_cache <- getOption("nomisdata.cache_dir")
-  on.exit({
-    options(nomisdata.cache_dir = orig_cache)
-    if (dir.exists(temp_dir)) unlink(temp_dir, recursive = TRUE)
-  })
-  
-  options(nomisdata.cache_dir = temp_dir)
-  
-  cache_key <- "test_key_123"
-  test_data <- data.frame(x = 1:3, y = letters[1:3])
-  
-  cache_data(cache_key, test_data)
-  retrieved <- get_cached_data(cache_key)
-  
+  retrieved <- get_cached_data("test")
   expect_equal(retrieved, test_data)
 })
 
-test_that("get_cached_data respects max_age", {
-  skip_on_cran()
-  skip_if(nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_")))
+test_that("get_cached_data respects max_age_days", {
+  temp <- tempfile()
+  dir.create(temp)
+  withr::local_options(nomisdata.cache_dir = temp)
+  on.exit(unlink(temp, recursive = TRUE))
   
-  temp_dir <- file.path(tempdir(), "nomisdata_test_maxage")
-  if (dir.exists(temp_dir)) unlink(temp_dir, recursive = TRUE)
-  dir.create(temp_dir, recursive = TRUE, showWarnings = FALSE)
-  
-  orig_cache <- getOption("nomisdata.cache_dir")
-  on.exit({
-    options(nomisdata.cache_dir = orig_cache)
-    if (dir.exists(temp_dir)) unlink(temp_dir, recursive = TRUE)
-  })
-  
-  options(nomisdata.cache_dir = temp_dir)
-  
-  cache_key <- "old_data"
   test_data <- data.frame(x = 1)
+  cache_data("old", test_data)
   
-  cache_data(cache_key, test_data)
+  meta_file <- file.path(temp, "old_meta.rds")
+  meta <- readRDS(meta_file)
+  meta$timestamp <- Sys.time() - as.difftime(31, units = "days")
+  saveRDS(meta, meta_file)
   
-  expect_equal(get_cached_data(cache_key, max_age = 3600), test_data)
-  expect_null(get_cached_data(cache_key, max_age = 0))
+  result <- suppressMessages(get_cached_data("old", max_age_days = 30))
+  expect_null(result)
 })
-
-test_that("get_nomis_cache_dir returns path during checks", {
-  cache_path <- get_nomis_cache_dir()
-  
-  expect_type(cache_path, "character")
-  expect_true(nchar(cache_path) > 0)
-})
-

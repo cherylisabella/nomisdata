@@ -1,9 +1,4 @@
-# Tests for authentication functions
-
-# ============================================================================
 # set_api_key() basic tests
-# ============================================================================
-
 test_that("set_api_key sets key for current session", {
   orig_key <- getOption("nomisdata.api_key")
   withr::defer(options(nomisdata.api_key = orig_key))
@@ -117,10 +112,7 @@ test_that("set_api_key overwrites existing key", {
   expect_equal(getOption("nomisdata.api_key"), "new_key")
 })
 
-# ============================================================================
 # add_to_renviron() tests
-# ============================================================================
-
 test_that("add_to_renviron doesn't run during R CMD check", {
   orig_check <- Sys.getenv("_R_CHECK_PACKAGE_NAME_")
   withr::defer(Sys.setenv("_R_CHECK_PACKAGE_NAME_" = orig_check))
@@ -144,10 +136,7 @@ test_that("add_to_renviron returns invisible NULL during check", {
   expect_null(result)
 })
 
-# ============================================================================
 # Integration tests
-# ============================================================================
-
 test_that("set_api_key then get_option retrieves same key", {
   orig_key <- getOption("nomisdata.api_key")
   withr::defer(options(nomisdata.api_key = orig_key))

@@ -95,4 +95,3 @@ parse_json_response <- function(resp) {
   parsed <- jsonlite::fromJSON(content, flatten = TRUE)
   parsed
 }
-

@@ -478,7 +478,7 @@ citation("nomisdata")
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/cherylisabella/nomisdata/CONTRIBUTING.md) for guidelines. Quick start:
+See [CONTRIBUTING.md](https://github.com/cherylisabella/nomisdata/blob/main/CONTRIBUTING.md) for guidelines. Quick start:
 
 ```r
 # Fork and clone

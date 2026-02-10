@@ -1,442 +1,162 @@
-# Tests for dataset discovery functions
-
-# ============================================================================
-# search_datasets() tests
-# ============================================================================
-
+# search_datasets validation
 test_that("search_datasets requires at least one parameter", {
-  expect_error(
-    search_datasets(),
-    "At least one search parameter required"
-  )
+  expect_error(search_datasets(), "At least one search parameter required")
 })
 
-test_that("search_datasets accepts name parameter", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- search_datasets(name = "*employment*")
-  
-  expect_s3_class(result, "tbl_df")
-})
-
-test_that("search_datasets accepts keywords parameter", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- search_datasets(keywords = "census")
-  
-  expect_s3_class(result, "tbl_df")
-})
-
-test_that("search_datasets accepts description parameter", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- search_datasets(description = "*population*")
-  
-  expect_s3_class(result, "tbl_df")
-})
-
-test_that("search_datasets accepts content_type parameter", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- search_datasets(content_type = "dataset")
-  
-  expect_s3_class(result, "tbl_df")
-})
-
-test_that("search_datasets accepts units parameter", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- search_datasets(units = "*persons*")
-  
-  expect_s3_class(result, "tbl_df")
-})
-
-test_that("search_datasets accepts multiple parameters", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- search_datasets(
-    name = "*benefit*",
-    keywords = "claimants"
+# search_datasets parameter handling
+test_that("search_datasets builds searches list from name", {
+  local_mocked_bindings(
+    build_request = function(path, params, format) {
+      expect_match(path, "search=name-")
+      structure(list(), class = "httr2_request")
+    },
+    execute_request = function(...) structure(list(), class = "httr2_response"),
+    parse_json_response = function(...) list(structure = list(keyfamilies = list(keyfamily = data.frame(id = "test"))))
   )
   
+  result <- search_datasets(name = "test")
   expect_s3_class(result, "tbl_df")
-})
-
-test_that("search_datasets handles multiple name values", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- search_datasets(name = c("*employment*", "*benefit*"))
-  
-  expect_s3_class(result, "tbl_df")
-})
-
-test_that("search_datasets handles multiple keywords", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- search_datasets(keywords = c("census", "population"))
-  
-  expect_s3_class(result, "tbl_df")
-})
-
-test_that("search_datasets informs when no datasets found", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  expect_message(
-    result <- search_datasets(name = "*zzzznonexistent999*"),
-    "No datasets found"
-  )
-  
-  expect_s3_class(result, "tbl_df")
-  expect_equal(nrow(result), 0)
-})
-
-test_that("search_datasets returns empty tibble when no matches", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- suppressMessages(
-    search_datasets(name = "*impossible999xyz*")
-  )
-  
-  expect_s3_class(result, "tbl_df")
-  expect_equal(nrow(result), 0)
-})
-
-test_that("search_datasets with all parameters", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- search_datasets(
-    name = "*employment*",
-    keywords = "census"
-  )
-  
-  expect_s3_class(result, "tbl_df")
-})
-
-test_that("search_datasets handles NULL parameters correctly", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- search_datasets(
-    name = "*test*",
-    keywords = NULL,
-    description = NULL
-  )
-  
-  expect_s3_class(result, "tbl_df")
-})
-
-# ============================================================================
-# describe_dataset() tests
-# ============================================================================
-
-test_that("describe_dataset returns metadata for specific dataset", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- describe_dataset("NM_1_1")
-  
-  expect_s3_class(result, "tbl_df")
-  expect_true(ncol(result) > 0)
-})
-
-test_that("describe_dataset without ID returns all datasets", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- describe_dataset()
-  
-  expect_s3_class(result, "tbl_df")
-  expect_true(nrow(result) > 10)
-})
-
-test_that("describe_dataset with NULL ID returns all datasets", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- describe_dataset(id = NULL)
-  
-  expect_s3_class(result, "tbl_df")
-  expect_true(nrow(result) > 10)
-})
-
-test_that("describe_dataset builds correct path with ID", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  expect_error(describe_dataset("NM_1_1"), NA)
-})
-
-test_that("describe_dataset builds correct path without ID", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  expect_error(describe_dataset(), NA)
-})
-
-test_that("describe_dataset returns tibble", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- describe_dataset("NM_1_1")
-  
-  expect_s3_class(result, "tbl_df")
-  expect_true(is.data.frame(result))
-})
-
-# ============================================================================
-# dataset_overview() tests
-# ============================================================================
-
-test_that("dataset_overview requires ID", {
-  expect_error(
-    dataset_overview(),
-    "Dataset ID required"
-  )
-})
-
-test_that("dataset_overview returns overview info", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- dataset_overview("NM_1_1")
-  
-  expect_s3_class(result, "tbl_df")
-  expect_true("name" %in% names(result))
-  expect_true("value" %in% names(result))
-})
-
-test_that("dataset_overview accepts select parameter", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- dataset_overview("NM_1_1", select = "Keywords")
-  
-  expect_s3_class(result, "tbl_df")
-})
-
-test_that("dataset_overview accepts multiple select values", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- dataset_overview("NM_1_1", select = c("Keywords", "Units"))
-  
-  expect_s3_class(result, "tbl_df")
-})
-
-test_that("dataset_overview with NULL select", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- dataset_overview("NM_1_1", select = NULL)
-  
-  expect_s3_class(result, "tbl_df")
-})
-
-test_that("dataset_overview returns name-value pairs", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- dataset_overview("NM_1_1")
-  
-  expect_equal(ncol(result), 2)
-  expect_true(all(c("name", "value") %in% names(result)))
-})
-
-# ============================================================================
-# Integration tests
-# ============================================================================
-
-test_that("search and describe work together", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  search_result <- search_datasets(name = "*employment*")
-  
-  if (nrow(search_result) > 0 && "id" %in% names(search_result)) {
-    dataset_id <- search_result$id[1]
-    desc <- describe_dataset(dataset_id)
-    
-    expect_s3_class(desc, "tbl_df")
-  }
-})
-
-test_that("describe and overview work together", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  desc <- describe_dataset("NM_1_1")
-  overview <- dataset_overview("NM_1_1")
-  
-  expect_s3_class(desc, "tbl_df")
-  expect_s3_class(overview, "tbl_df")
-})
-
-test_that("search_datasets collapses vectors with commas", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  expect_error(
-    search_datasets(name = c("*test1*", "*test2*")),
-    NA
-  )
-})
-
-test_that("dataset_overview collapses select with commas", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  expect_error(
-    dataset_overview("NM_1_1", select = c("Keywords", "Units")),
-    NA
-  )
-})
-
-test_that("search_datasets builds correct query string", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  result <- search_datasets(name = "*test*")
-  
-  expect_s3_class(result, "tbl_df")
-})
-
-test_that("dataset_overview builds correct path", {
-  skip_if_no_api()
-  skip_on_cran()
-  
-  expect_error(
-    dataset_overview("NM_1_1"),
-    NA
-  )
-})
-
-test_that("search_datasets validates at least one param", {
-  expect_error(search_datasets(), "At least one search parameter")
-})
-
-test_that("search_datasets builds searches list", {
-  expect_true(is.function(search_datasets))
 })
 
 test_that("search_datasets collapses name vector", {
-  expect_true(is.function(search_datasets))
+  local_mocked_bindings(
+    build_request = function(path, ...) {
+      expect_match(path, "a,b")
+      structure(list(), class = "httr2_request")
+    },
+    execute_request = function(...) structure(list(), class = "httr2_response"),
+    parse_json_response = function(...) list(structure = list(keyfamilies = list(keyfamily = data.frame(id = "x"))))
+  )
+  
+  search_datasets(name = c("a", "b"))
 })
 
-test_that("search_datasets collapses keywords vector", {
-  expect_true(is.function(search_datasets))
+test_that("search_datasets handles all parameters", {
+  local_mocked_bindings(
+    build_request = function(path, ...) {
+      expect_match(path, "search=name-")
+      expect_match(path, "search=keywords-")
+      expect_match(path, "search=description-")
+      expect_match(path, "search=contenttype-")
+      expect_match(path, "search=units-")
+      structure(list(), class = "httr2_request")
+    },
+    execute_request = function(...) structure(list(), class = "httr2_response"),
+    parse_json_response = function(...) list(structure = list(keyfamilies = list(keyfamily = data.frame(id = "x"))))
+  )
+  
+  search_datasets(name = "a", keywords = "b", description = "c", content_type = "d", units = "e")
 })
 
-test_that("search_datasets collapses description vector", {
-  expect_true(is.function(search_datasets))
+test_that("search_datasets returns empty tibble when no results", {
+  local_mocked_bindings(
+    build_request = function(...) structure(list(), class = "httr2_request"),
+    execute_request = function(...) structure(list(), class = "httr2_response"),
+    parse_json_response = function(...) list(structure = list(keyfamilies = list(keyfamily = NULL)))
+  )
+  
+  expect_message(result <- search_datasets(name = "test"), "No datasets found")
+  expect_s3_class(result, "tbl_df")
+  expect_equal(nrow(result), 0)
 })
 
-test_that("search_datasets collapses content_type vector", {
-  expect_true(is.function(search_datasets))
-})
-
-test_that("search_datasets collapses units vector", {
-  expect_true(is.function(search_datasets))
-})
-
-test_that("search_datasets checks for empty searches list", {
-  expect_error(search_datasets(), "required")
-})
-
-test_that("search_datasets builds query string", {
-  expect_true(is.function(search_datasets))
-})
-
-test_that("search_datasets uses mapply", {
-  expect_true(is.function(search_datasets))
-})
-
-test_that("search_datasets unlist search_params", {
-  expect_true(is.function(search_datasets))
-})
-
-test_that("search_datasets pastes with &", {
-  expect_true(is.function(search_datasets))
-})
-
-test_that("search_datasets adds .sdmx.json", {
-  expect_true(is.function(search_datasets))
-})
-
-test_that("search_datasets checks for NULL keyfamily", {
-  expect_true(is.function(search_datasets))
-})
-
-test_that("search_datasets returns empty tibble on NULL", {
-  expect_true(is.function(search_datasets))
-})
-
-test_that("describe_dataset has NULL default for id", {
-  expect_true(is.function(describe_dataset))
-})
-
+# describe_dataset tests
 test_that("describe_dataset builds path without id", {
-  expect_true(is.function(describe_dataset))
+  local_mocked_bindings(
+    build_request = function(path, ...) {
+      expect_equal(path, "def.sdmx.json")
+      structure(list(), class = "httr2_request")
+    },
+    execute_request = function(...) structure(list(), class = "httr2_response"),
+    parse_json_response = function(...) list(structure = list(keyfamilies = list(keyfamily = data.frame(id = "x"))))
+  )
+  
+  result <- describe_dataset()
+  expect_s3_class(result, "tbl_df")
 })
 
 test_that("describe_dataset builds path with id", {
-  expect_true(is.function(describe_dataset))
+  local_mocked_bindings(
+    build_request = function(path, ...) {
+      expect_equal(path, "NM_1_1/def.sdmx.json")
+      structure(list(), class = "httr2_request")
+    },
+    execute_request = function(...) structure(list(), class = "httr2_response"),
+    parse_json_response = function(...) list(structure = list(keyfamilies = list(keyfamily = data.frame(id = "x"))))
+  )
+  
+  result <- describe_dataset("NM_1_1")
+  expect_s3_class(result, "tbl_df")
 })
 
-test_that("describe_dataset checks is.null(id)", {
-  expect_true(is.function(describe_dataset))
+test_that("describe_dataset handles NULL id", {
+  local_mocked_bindings(
+    build_request = function(path, ...) {
+      expect_equal(path, "def.sdmx.json")
+      structure(list(), class = "httr2_request")
+    },
+    execute_request = function(...) structure(list(), class = "httr2_response"),
+    parse_json_response = function(...) list(structure = list(keyfamilies = list(keyfamily = data.frame(id = "x"))))
+  )
+  
+  result <- describe_dataset(id = NULL)
+  expect_s3_class(result, "tbl_df")
 })
 
-test_that("describe_dataset uses if-else", {
-  expect_true(is.function(describe_dataset))
-})
-
-test_that("describe_dataset returns tibble", {
-  expect_true(is.function(describe_dataset))
-})
-
-test_that("dataset_overview validates id", {
+# dataset_overview tests
+test_that("dataset_overview requires id", {
   expect_error(dataset_overview(), "Dataset ID required")
 })
 
-test_that("dataset_overview validates missing id", {
-  expect_error(dataset_overview(), "required")
+test_that("dataset_overview builds path correctly", {
+  local_mocked_bindings(
+    build_request = function(path, params, ...) {
+      expect_equal(path, "NM_1_1.overview.json")
+      expect_equal(length(params), 0)
+      structure(list(), class = "httr2_request")
+    },
+    execute_request = function(...) structure(list(), class = "httr2_response"),
+    parse_json_response = function(...) list(overview = list(name = "test", value = "data"))
+  )
+  
+  result <- dataset_overview("NM_1_1")
+  expect_s3_class(result, "tbl_df")
+})
+
+test_that("dataset_overview handles select parameter", {
+  local_mocked_bindings(
+    build_request = function(path, params, ...) {
+      expect_equal(params$select, "Keywords,Units")
+      structure(list(), class = "httr2_request")
+    },
+    execute_request = function(...) structure(list(), class = "httr2_response"),
+    parse_json_response = function(...) list(overview = list(a = 1))
+  )
+  
+  dataset_overview("NM_1_1", select = c("Keywords", "Units"))
 })
 
 test_that("dataset_overview handles NULL select", {
-  expect_true(is.function(dataset_overview))
-})
-
-test_that("dataset_overview builds params with select", {
-  expect_true(is.function(dataset_overview))
-})
-
-test_that("dataset_overview collapses select vector", {
-  expect_true(is.function(dataset_overview))
-})
-
-test_that("dataset_overview uses empty list for NULL select", {
-  expect_true(is.function(dataset_overview))
-})
-
-test_that("dataset_overview adds .overview.json", {
-  expect_true(is.function(dataset_overview))
-})
-
-test_that("dataset_overview returns tibble", {
-  expect_true(is.function(dataset_overview))
+  local_mocked_bindings(
+    build_request = function(path, params, ...) {
+      expect_equal(length(params), 0)
+      structure(list(), class = "httr2_request")
+    },
+    execute_request = function(...) structure(list(), class = "httr2_response"),
+    parse_json_response = function(...) list(overview = list(a = 1))
+  )
+  
+  dataset_overview("NM_1_1", select = NULL)
 })
 
 test_that("dataset_overview uses enframe", {
-  expect_true(is.function(dataset_overview))
+  local_mocked_bindings(
+    build_request = function(...) structure(list(), class = "httr2_request"),
+    execute_request = function(...) structure(list(), class = "httr2_response"),
+    parse_json_response = function(...) list(overview = list(key1 = "val1", key2 = "val2"))
+  )
+  
+  result <- dataset_overview("NM_1_1")
+  expect_equal(names(result), c("name", "value"))
+  expect_equal(nrow(result), 2)
 })

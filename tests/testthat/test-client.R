@@ -1,9 +1,4 @@
-# Tests for HTTP client functions
-
-# ============================================================================
 # build_request() tests
-# ============================================================================
-
 test_that("build_request creates valid request object", {
   req <- build_request("NM_1_1.data.csv", list(time = "latest"), format = "")
   
@@ -85,10 +80,7 @@ test_that("build_request doesn't include API key when not set", {
   expect_false(grepl("uid=", req$url))
 })
 
-# ============================================================================
 # execute_request() tests
-# ============================================================================
-
 test_that("execute_request returns httr2_response", {
   skip_if_no_api()
   skip_on_cran()
@@ -108,10 +100,7 @@ test_that("execute_request handles valid requests", {
   expect_error(execute_request(req), NA)
 })
 
-# ============================================================================
 # Integration tests
-# ============================================================================
-
 test_that("build_request and execute_request work together", {
   skip_if_no_api()
   skip_on_cran()

@@ -1,9 +1,9 @@
 Package: nomisdata
 Type: Package
 Title: Access 'Nomis' UK Labour Market Data and Statistics
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: person(given = c("Cheryl", "Isabella"), family = "Lim", role = c("aut", "cre"), email = "cheryl.academic@gmail.com", comment = c(ORCID = "0009-0004-5766-1392"))
-Description: Interface to the 'Nomis' database (<https://www.nomisweb.co.uk>), a comprehensive resource of United Kingdom labour market statistics provided by the Office for National Statistics (ONS). Facilitates programmatic access to census data, labour force surveys, benefit statistics, and socioeconomic indicators through a modern HTTP client with intelligent caching, automatic query pagination, and tidy data principles. Includes spatial data integration, interactive helpers, and visualization utilities. Independent implementation unaffiliated with ONS or Durham University.
+Description: Interface to the 'Nomis' database (<https://www.nomisweb.co.uk>), maintained by Durham University on behalf of the Office for National Statistics (ONS). Provides access to UK labour market statistics including census data, benefit claimant counts, and employment surveys. Supports automatic pagination, optional disk caching, spatial data via 'sf', and tidy data output. Independent implementation unaffiliated with ONS or Durham University.
 License: MIT + file LICENSE
 URL: https://github.com/cherylisabella/nomisdata
 BugReports: https://github.com/cherylisabella/nomisdata/issues

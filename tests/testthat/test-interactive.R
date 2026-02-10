@@ -1,9 +1,4 @@
-# Tests for interactive functions
-
-# ============================================================================
 # browse_dataset() tests
-# ============================================================================
-
 test_that("browse_dataset creates correct URL for dataset page", {
   expect_message(
     browse_dataset("NM_1_1", page = "dataset"),
@@ -89,10 +84,7 @@ test_that("browse_dataset handles all page types", {
   }
 })
 
-# ============================================================================
 # explore_dataset() tests
-# ============================================================================
-
 test_that("explore_dataset requires interactive session", {
   skip_if(interactive())
   
